@@ -23,6 +23,10 @@ public partial class Tour
 
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
+    public virtual ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
+
+    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+
     public virtual ICollection<TourAsset> TourAssets { get; set; } = new List<TourAsset>();
 
     public virtual TourType Type { get; set; } = null!;

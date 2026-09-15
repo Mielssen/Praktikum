@@ -22,7 +22,15 @@ public partial class PraktikumContext : DbContext
 
     public virtual DbSet<Credential> Credentials { get; set; }
 
+    public virtual DbSet<Favorite> Favorites { get; set; }
+
+    public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+
     public virtual DbSet<Penalty> Penalties { get; set; }
+
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+
+    public virtual DbSet<Review> Reviews { get; set; }
 
     public virtual DbSet<SavedPerson> SavedPersons { get; set; }
 
@@ -35,9 +43,7 @@ public partial class PraktikumContext : DbContext
     public virtual DbSet<UserDetail> UserDetails { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseMySql("server=localhost;database=praktikum;uid=root;pwd=Dimonpokemon2008", Microsoft.EntityFrameworkCore.ServerVersion.Parse("9.4.0-mysql"));
-
+    { }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -66,6 +72,7 @@ public partial class PraktikumContext : DbContext
             entity.Property(e => e.NumberOfPeople)
                 .HasDefaultValueSql("'1'")
                 .HasColumnName("number_of_people");
+            entity.Property(e => e.ReminderSent).HasColumnName("reminder_sent");
             entity.Property(e => e.StartDate).HasColumnName("start_date");
             entity.Property(e => e.Status)
                 .HasColumnType("enum('pending','confirmed','cancelled')")
@@ -127,6 +134,7 @@ public partial class PraktikumContext : DbContext
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .HasColumnName("email");
+            entity.Property(e => e.MustChangePassword).HasColumnName("must_change_password");
             entity.Property(e => e.PasswordHash)
                 .HasMaxLength(255)
                 .HasColumnName("password_hash");
@@ -137,6 +145,60 @@ public partial class PraktikumContext : DbContext
                 .HasDefaultValueSql("'active'")
                 .HasColumnType("enum('active','deleted')")
                 .HasColumnName("status");
+        });
+
+        modelBuilder.Entity<Favorite>(entity =>
+        {
+            entity.HasKey(e => e.FavoriteId).HasName("PRIMARY");
+
+            entity.ToTable("favorites");
+
+            entity.HasIndex(e => e.TourId, "tour_id");
+
+            entity.HasIndex(e => new { e.CredentialId, e.TourId }, "uq_favorite").IsUnique();
+
+            entity.Property(e => e.FavoriteId).HasColumnName("favorite_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.CredentialId).HasColumnName("credential_id");
+            entity.Property(e => e.TourId).HasColumnName("tour_id");
+
+            entity.HasOne(d => d.Credential).WithMany(p => p.Favorites)
+                .HasForeignKey(d => d.CredentialId)
+                .HasConstraintName("favorites_ibfk_1");
+
+            entity.HasOne(d => d.Tour).WithMany(p => p.Favorites)
+                .HasForeignKey(d => d.TourId)
+                .HasConstraintName("favorites_ibfk_2");
+        });
+
+        modelBuilder.Entity<PasswordResetToken>(entity =>
+        {
+            entity.HasKey(e => e.TokenId).HasName("PRIMARY");
+
+            entity.ToTable("password_reset_tokens");
+
+            entity.HasIndex(e => e.CredentialId, "credential_id");
+
+            entity.HasIndex(e => e.Token, "idx_reset_token");
+
+            entity.Property(e => e.TokenId).HasColumnName("token_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.CredentialId).HasColumnName("credential_id");
+            entity.Property(e => e.ExpiresAt)
+                .HasColumnType("datetime")
+                .HasColumnName("expires_at");
+            entity.Property(e => e.Token).HasColumnName("token");
+            entity.Property(e => e.Used).HasColumnName("used");
+
+            entity.HasOne(d => d.Credential).WithMany(p => p.PasswordResetTokens)
+                .HasForeignKey(d => d.CredentialId)
+                .HasConstraintName("password_reset_tokens_ibfk_1");
         });
 
         modelBuilder.Entity<Penalty>(entity =>
@@ -160,6 +222,71 @@ public partial class PraktikumContext : DbContext
                 .HasForeignKey(d => d.BookingId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("penalties_ibfk_1");
+        });
+
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(e => e.TokenId).HasName("PRIMARY");
+
+            entity.ToTable("refresh_tokens");
+
+            entity.HasIndex(e => e.CredentialId, "credential_id");
+
+            entity.HasIndex(e => e.Token, "idx_refresh_token");
+
+            entity.Property(e => e.TokenId).HasColumnName("token_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.CredentialId).HasColumnName("credential_id");
+            entity.Property(e => e.ExpiresAt)
+                .HasColumnType("datetime")
+                .HasColumnName("expires_at");
+            entity.Property(e => e.Revoked).HasColumnName("revoked");
+            entity.Property(e => e.Token).HasColumnName("token");
+
+            entity.HasOne(d => d.Credential).WithMany(p => p.RefreshTokens)
+                .HasForeignKey(d => d.CredentialId)
+                .HasConstraintName("refresh_tokens_ibfk_1");
+        });
+
+        modelBuilder.Entity<Review>(entity =>
+        {
+            entity.HasKey(e => e.ReviewId).HasName("PRIMARY");
+
+            entity.ToTable("reviews");
+
+            entity.HasIndex(e => e.CredentialId, "credential_id");
+
+            entity.HasIndex(e => e.TourId, "tour_id");
+
+            entity.HasIndex(e => e.BookingId, "uq_booking_review").IsUnique();
+
+            entity.Property(e => e.ReviewId).HasColumnName("review_id");
+            entity.Property(e => e.BookingId).HasColumnName("booking_id");
+            entity.Property(e => e.Comment)
+                .HasColumnType("text")
+                .HasColumnName("comment");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.CredentialId).HasColumnName("credential_id");
+            entity.Property(e => e.Rating).HasColumnName("rating");
+            entity.Property(e => e.TourId).HasColumnName("tour_id");
+
+            entity.HasOne(d => d.Booking).WithOne(p => p.Review)
+                .HasForeignKey<Review>(d => d.BookingId)
+                .HasConstraintName("reviews_ibfk_3");
+
+            entity.HasOne(d => d.Credential).WithMany(p => p.Reviews)
+                .HasForeignKey(d => d.CredentialId)
+                .HasConstraintName("reviews_ibfk_1");
+
+            entity.HasOne(d => d.Tour).WithMany(p => p.Reviews)
+                .HasForeignKey(d => d.TourId)
+                .HasConstraintName("reviews_ibfk_2");
         });
 
         modelBuilder.Entity<SavedPerson>(entity =>
@@ -260,6 +387,9 @@ public partial class PraktikumContext : DbContext
             entity.HasIndex(e => e.CredentialId, "credential_id").IsUnique();
 
             entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.AvatarUrl)
+                .HasMaxLength(255)
+                .HasColumnName("avatar_url");
             entity.Property(e => e.CredentialId).HasColumnName("credential_id");
             entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth");
             entity.Property(e => e.Name)

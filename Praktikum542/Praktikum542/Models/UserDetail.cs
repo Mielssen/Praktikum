@@ -17,5 +17,7 @@ public partial class UserDetail
 
     public DateOnly? DateOfBirth { get; set; }
 
+    public string? AvatarUrl { get; set; }
+
     public virtual Credential Credential { get; set; } = null!;
 }
