@@ -38,3 +38,32 @@
 ### База даних
 * **СУБД:** MySQL Server.
 * Підхід до проєктування: Database-First (або Code-First) із використанням міграцій та реляційних зв'язків між таблицями (Клієнти, Тури, Бронювання).
+
+
+
+
+
+## Інструкція із запуску проєкту
+
+### Вимоги до оточення
+* **.NET SDK** (версія 8.0 або новіша).
+* **MySQL Server** (версія 8.0+).
+* **MySQL Workbench**, **DBeaver** або інший клієнт для БД.
+* **Git**.
+
+### Покроковий запуск
+
+* **1. Налаштування бази даних**:
+  * Переконайтеся, що служба **MySQL Server** запущена.
+  * Створіть базу даних: `CREATE DATABASE TravelManagerDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
+  * У файлі `TravelManager.API/appsettings.json` вкажіть ваш пароль та рядок підключення у секції `"ConnectionStrings"`.
+
+* **2. Застосування міграцій**:
+  * Перейдіть у каталог бекенду: `cd TravelManager.API`
+  * Застосуйте міграції для створення таблиць: `dotnet ef database update`
+  * *(Якщо утиліту ще не встановлено, виконайте: `dotnet tool install --global dotnet-ef`)*
+
+* **3. Запуск застосунку**:
+  * Запустіть проєкт командою: `dotnet run`
+  * **Клієнтська частина (Frontend):** відкрийте `http://localhost:5000/` або `https://localhost:7000/`
+  * **Документація API (Swagger UI):** відкрийте `http://localhost:5000/swagger`
