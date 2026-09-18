@@ -108,3 +108,54 @@ function showLogin() {
     get("registerBox").classList.add("hidden");
     get("loginBox").classList.remove("hidden");
 }
+
+function openForgotModal() {
+    get("forgotEmail").value = get("loginEmail").value || "";
+    get("forgotError").innerText = "";
+    get("forgotFormState").classList.remove("hidden");
+    get("forgotSuccessState").classList.add("hidden");
+    get("forgotModal").classList.remove("hidden");
+}
+
+function closeForgotModal() {
+    get("forgotModal").classList.add("hidden");
+}
+
+async function submitForgotPassword() {
+    const email = get("forgotEmail").value.trim();
+    const errorBox = get("forgotError");
+    const btn = get("forgotSubmitBtn");
+
+    errorBox.innerText = "";
+
+    if (!email) {
+        errorBox.innerText = "Введіть email";
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Надсилаємо...";
+
+    try {
+        const res = await fetch(API + "/forgot-password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email })
+        });
+
+        const data = await safeJson(res);
+
+        if (!res.ok) {
+            errorBox.innerText = data?.message || "Не вдалося надіслати лист";
+            return;
+        }
+
+        get("forgotFormState").classList.add("hidden");
+        get("forgotSuccessState").classList.remove("hidden");
+    } catch (e) {
+        errorBox.innerText = "Немає з'єднання з сервером. Спробуйте пізніше.";
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Надіслати";
+    }
+}

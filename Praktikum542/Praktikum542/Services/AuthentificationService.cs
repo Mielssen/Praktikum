@@ -220,7 +220,7 @@ namespace Praktikum542.Services
                 throw new AppException("INVALID_TOKEN", "Токен обов'язковий");
 
             if (string.IsNullOrWhiteSpace(dto.NewPassword) || dto.NewPassword.Length < 6)
-                throw new AppException("INVALID_PASSWORD", "Пароль має містити мінімум 6 символів");
+                    throw new AppException("INVALID_PASSWORD", "Пароль має містити мінімум 6 символів");
 
             var resetToken = _resetRepo.GetValidToken(dto.Token);
             if (resetToken == null)
