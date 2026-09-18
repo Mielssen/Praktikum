@@ -91,6 +91,8 @@ builder.Services.AddScoped<TourRepository>();
 builder.Services.AddScoped<TourService>();
 builder.Services.AddScoped<AdminRepository>();
 builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<PasswordResetRepository>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 
@@ -155,7 +157,6 @@ app.UseAuthentication();
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseAuthorization();
 
-// Swagger тепер запускається коректно і стає головною сторінкою проєкту
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

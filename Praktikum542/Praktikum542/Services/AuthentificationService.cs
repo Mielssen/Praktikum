@@ -15,10 +15,14 @@ namespace Praktikum542.Services
         private readonly CredentialsRepository _repo;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AuthentificationService> _logger;
+        private readonly PasswordResetRepository _resetRepo;
+        private readonly IEmailService _emailService;
 
-        public AuthentificationService(CredentialsRepository repo, IConfiguration configuration, ILogger<AuthentificationService> logger)
+        public AuthentificationService(CredentialsRepository repo, PasswordResetRepository resetRepo, IEmailService emailService, IConfiguration configuration, ILogger<AuthentificationService> logger)
         {
             _repo = repo;
+            _resetRepo = resetRepo;
+            _emailService = emailService;
             _configuration = configuration;
             _logger = logger;
         }
@@ -171,6 +175,73 @@ namespace Praktikum542.Services
             {
                 Token = GenerateJwtToken(user)
             };
+        }
+        public async Task ForgotPassword(ForgotPasswordDto dto)
+        {
+            var email = dto.Email?.Trim().ToLower();
+            ValidateEmail(email);
+
+            var user = _repo.GetByEmail(email);
+
+            if (user == null)
+            {
+                _logger.LogInformation("Forgot-password для неіснуючого email: {Email}", email);
+                return;
+            }
+
+            _resetRepo.InvalidateOldTokens(user.CredentialId);
+
+            var token = GenerateResetToken();
+
+            _resetRepo.Add(new PasswordResetToken
+            {
+                CredentialId = user.CredentialId,
+                Token = token,
+                ExpiresAt = DateTime.Now.AddMinutes(30),
+                Used = false,
+                CreatedAt = DateTime.Now
+            });
+
+            var resetUrl = $"{_configuration["Frontend:ResetPasswordUrl"]}?token={token}";
+
+            var body = $@"
+        <p>Ви запросили скидання паролю.</p>
+        <p><a href='{resetUrl}'>Натисніть тут, щоб скинути пароль</a></p>
+        <p>Посилання дійсне 30 хвилин. Якщо це не ви — проігноруйте лист.</p>";
+
+            await _emailService.SendAsync(user.Email, "Скидання паролю", body);
+
+            _logger.LogInformation("Reset-token створено для UserID={UserId}", user.CredentialId);
+        }
+
+        public void ResetPassword(ResetPasswordDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Token))
+                throw new AppException("INVALID_TOKEN", "Токен обов'язковий");
+
+            if (string.IsNullOrWhiteSpace(dto.NewPassword) || dto.NewPassword.Length < 6)
+                throw new AppException("INVALID_PASSWORD", "Пароль має містити мінімум 6 символів");
+
+            var resetToken = _resetRepo.GetValidToken(dto.Token);
+            if (resetToken == null)
+                throw new AppException("INVALID_TOKEN", "Токен недійсний або прострочений");
+
+            var user = _repo.GetById(resetToken.CredentialId);
+            if (user == null)
+                throw new AppException("NOT_FOUND", "Користувача не знайдено");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            _repo.UpdatePassword(user);
+            _resetRepo.MarkUsed(resetToken);
+
+            _logger.LogInformation("Пароль скинуто для UserID={UserId}", user.CredentialId);
+        }
+
+        private string GenerateResetToken()
+        {
+            var bytes = System.Security.Cryptography.RandomNumberGenerator.GetBytes(32);
+            return Convert.ToBase64String(bytes)
+                .Replace("+", "-").Replace("/", "_").Replace("=", "");
         }
     }
 }

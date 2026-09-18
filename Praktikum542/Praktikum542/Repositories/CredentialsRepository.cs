@@ -50,5 +50,10 @@
             _context.UserDetails.Update(detail);
             _context.SaveChanges();
         }
+        public void UpdatePassword(Credential credential)
+        {
+            _context.Credentials.Update(credential);
+            _context.SaveChanges();
+        }
     }
 }
