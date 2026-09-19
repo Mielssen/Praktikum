@@ -14,10 +14,11 @@ namespace Praktikum542.Controllers
         private readonly CredentialsRepository _repo;
         private readonly AuthentificationService _authService;
         private readonly IWebHostEnvironment _environment;
+
         public AuthController(
-     CredentialsRepository repo,
-     AuthentificationService authService,
-     IWebHostEnvironment environment)
+            CredentialsRepository repo,
+            AuthentificationService authService,
+            IWebHostEnvironment environment)
         {
             _repo = repo;
             _authService = authService;
@@ -27,23 +28,18 @@ namespace Praktikum542.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterRequestDto dto)
         {
+            if (dto.Avatar != null && dto.Avatar.Length > 0)
+            {
+                var validationError = ValidateAvatar(dto.Avatar);
+
+                if (validationError != null)
+                    return BadRequest(validationError);
+            }
+
             var result = await _authService.RegisterUser(dto);
 
             if (dto.Avatar != null && dto.Avatar.Length > 0)
             {
-                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
-
-                var extension = Path.GetExtension(dto.Avatar.FileName)
-                    .ToLowerInvariant();
-
-                if (!allowedExtensions.Contains(extension))
-                    return BadRequest("Дозволені тільки JPG, JPEG та PNG файли");
-
-                const long maxFileSize = 5 * 1024 * 1024;
-
-                if (dto.Avatar.Length > maxFileSize)
-                    return BadRequest("Максимальний розмір файлу — 5 МБ");
-
                 var email = dto.Email.Trim().ToLower();
 
                 var credential = _repo.GetByEmail(email);
@@ -56,27 +52,9 @@ namespace Praktikum542.Controllers
                 if (detail == null)
                     return NotFound("Дані користувача не знайдено");
 
-                var avatarsFolder = Path.Combine(
-                    _environment.WebRootPath,
-                    "avatars"
-                );
+                var avatarUrl = await SaveAvatarAsync(dto.Avatar);
 
-                if (!Directory.Exists(avatarsFolder))
-                    Directory.CreateDirectory(avatarsFolder);
-
-                var fileName = $"{Guid.NewGuid()}{extension}";
-
-                var filePath = Path.Combine(
-                    avatarsFolder,
-                    fileName
-                );
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await dto.Avatar.CopyToAsync(stream);
-                }
-
-                detail.AvatarUrl = $"/avatars/{fileName}";
+                detail.AvatarUrl = avatarUrl;
 
                 _repo.UpdateUserDetail(detail);
             }
@@ -130,31 +108,25 @@ namespace Praktikum542.Controllers
                 return NotFound();
 
             detail.Name = dto.Name;
-            detail.Phone = dto.Phone != null ? "+38" + dto.Phone : detail.Phone;
+            detail.Phone = dto.Phone != null
+                ? "+38" + dto.Phone
+                : detail.Phone;
+
             detail.PassportData = dto.PassportData;
 
             _repo.UpdateUserDetail(detail);
 
             return Ok("Профіль оновлено");
         }
+
         [Authorize]
         [HttpPost("profile/avatar")]
         public async Task<IActionResult> UploadAvatar(IFormFile file)
         {
-            if (file == null || file.Length == 0)
-                return BadRequest("Файл не вибрано");
+            var validationError = ValidateAvatar(file);
 
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
-
-            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
-            if (!allowedExtensions.Contains(extension))
-                return BadRequest("Дозволені тільки JPG, JPEG та PNG файли");
-
-            const long maxFileSize = 5 * 1024 * 1024;
-
-            if (file.Length > maxFileSize)
-                return BadRequest("Максимальний розмір файлу — 5 МБ");
+            if (validationError != null)
+                return BadRequest(validationError);
 
             var credentialId = int.Parse(
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value
@@ -164,40 +136,11 @@ namespace Praktikum542.Controllers
 
             if (detail == null)
                 return NotFound("Користувача не знайдено");
-            if (!string.IsNullOrWhiteSpace(detail.AvatarUrl))
-            {
-                var oldAvatarPath = Path.Combine(
-                    _environment.WebRootPath,
-                    detail.AvatarUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar)
-                );
 
-                if (System.IO.File.Exists(oldAvatarPath))
-                {
-                    System.IO.File.Delete(oldAvatarPath);
-                }
-            }
-
-            var avatarsFolder = Path.Combine(
-                _environment.WebRootPath,
-                "avatars"
+            var avatarUrl = await SaveAvatarAsync(
+                file,
+                detail.AvatarUrl
             );
-
-            if (!Directory.Exists(avatarsFolder))
-                Directory.CreateDirectory(avatarsFolder);
-
-            var fileName = $"{Guid.NewGuid()}{extension}";
-
-            var filePath = Path.Combine(
-                avatarsFolder,
-                fileName
-            );
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            var avatarUrl = $"/avatars/{fileName}";
 
             detail.AvatarUrl = avatarUrl;
 
@@ -208,6 +151,81 @@ namespace Praktikum542.Controllers
                 message = "Аватар успішно завантажено",
                 avatarUrl = avatarUrl
             });
+        }
+
+        private string? ValidateAvatar(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return "Файл не вибрано";
+
+            var allowedExtensions = new[]
+            {
+                ".jpg",
+                ".jpeg",
+                ".png"
+            };
+
+            var extension = Path.GetExtension(file.FileName)
+                .ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+                return "Дозволені тільки JPG, JPEG та PNG файли";
+
+            const long maxFileSize = 5 * 1024 * 1024;
+
+            if (file.Length > maxFileSize)
+                return "Максимальний розмір файлу — 5 МБ";
+
+            return null;
+        }
+
+        private async Task<string> SaveAvatarAsync(
+            IFormFile file,
+            string? oldAvatarUrl = null)
+        {
+            var extension = Path.GetExtension(file.FileName)
+                .ToLowerInvariant();
+
+            var avatarsFolder = Path.Combine(
+                _environment.WebRootPath,
+                "avatars"
+            );
+
+            if (!Directory.Exists(avatarsFolder))
+            {
+                Directory.CreateDirectory(avatarsFolder);
+            }
+
+            if (!string.IsNullOrWhiteSpace(oldAvatarUrl))
+            {
+                var oldAvatarPath = Path.Combine(
+                    _environment.WebRootPath,
+                    oldAvatarUrl
+                        .TrimStart('/')
+                        .Replace('/', Path.DirectorySeparatorChar)
+                );
+
+                if (System.IO.File.Exists(oldAvatarPath))
+                {
+                    System.IO.File.Delete(oldAvatarPath);
+                }
+            }
+
+            var fileName = $"{Guid.NewGuid()}{extension}";
+
+            var filePath = Path.Combine(
+                avatarsFolder,
+                fileName
+            );
+
+            using (var stream = new FileStream(
+                filePath,
+                FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return $"/avatars/{fileName}";
         }
     }
 }
