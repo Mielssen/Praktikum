@@ -1,4 +1,4 @@
-﻿namespace Praktikum542.DTOs
+namespace Praktikum542.DTOs
 {
     public class ProfileDto
     {
@@ -11,5 +11,6 @@
         public string? Phone { get; set; }
         public string? PassportData { get; set; }
         public DateOnly? DateOfBirth { get; set; }
+        public string? AvatarUrl { get; set; }
     }
 }
