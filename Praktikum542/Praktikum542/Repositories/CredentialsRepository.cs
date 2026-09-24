@@ -1,4 +1,4 @@
-﻿namespace Praktikum542.Repositories
+namespace Praktikum542.Repositories
 {
     using Praktikum542.Models;
     using Microsoft.EntityFrameworkCore;
@@ -48,6 +48,11 @@
         public void UpdateUserDetail(UserDetail detail)
         {
             _context.UserDetails.Update(detail);
+            _context.SaveChanges();
+        }
+        public void UpdatePassword(Credential credential)
+        {
+            _context.Credentials.Update(credential);
             _context.SaveChanges();
         }
     }
