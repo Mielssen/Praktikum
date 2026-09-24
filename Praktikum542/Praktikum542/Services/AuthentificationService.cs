@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Praktikum542.DTOs;
@@ -172,5 +172,53 @@ namespace Praktikum542.Services
                 Token = GenerateJwtToken(user)
             };
         }
+        public void ChangePassword(int credentialId, ChangePasswordDto dto)
+        {
+            if (dto == null)
+                throw new AppException("NULL", "Дані не передані");
+
+            if (string.IsNullOrWhiteSpace(dto.OldPassword))
+                throw new AppException("INVALID_PASSWORD", "Старий пароль обов'язковий");
+
+            if (string.IsNullOrWhiteSpace(dto.NewPassword))
+                throw new AppException("INVALID_PASSWORD", "Новий пароль обов'язковий");
+
+            if (string.IsNullOrWhiteSpace(dto.ConfirmPassword))
+                throw new AppException("INVALID_PASSWORD", "Підтвердження пароля обов'язкове");
+
+            if (dto.NewPassword != dto.ConfirmPassword)
+                throw new AppException("PASSWORD_MISMATCH", "Нові паролі не співпадають");
+
+            var user = _repo.GetById(credentialId);
+
+            if (user == null)
+                throw new AppException("NOT_FOUND", "Користувача не знайдено");
+
+            if (!BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash))
+            {
+                _logger.LogWarning(
+                    "Невірний старий пароль при зміні пароля: CredentialId={CredentialId}",
+                    credentialId
+                );
+
+                throw new AppException("WRONG_PASSWORD", "Старий пароль введено неправильно");
+            }
+
+            if (BCrypt.Net.BCrypt.Verify(dto.NewPassword, user.PasswordHash))
+                throw new AppException(
+                    "SAME_PASSWORD",
+                    "Новий пароль не може співпадати зі старим"
+                );
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+            _repo.UpdatePassword(user);
+
+            _logger.LogInformation(
+                "Пароль успішно змінено: CredentialId={CredentialId}",
+                credentialId
+            );
+        }
     }
+
 }
