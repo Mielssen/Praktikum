@@ -118,7 +118,21 @@ namespace Praktikum542.Controllers
 
             return Ok("Профіль оновлено");
         }
+        [Authorize]
+        [HttpPut("change-password")]
+        public IActionResult ChangePassword([FromBody] ChangePasswordDto dto)
+        {
+            var credentialId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+            );
 
+            _authService.ChangePassword(credentialId, dto);
+
+            return Ok(new
+            {
+                message = "Пароль успішно змінено"
+            });
+        }
         [Authorize]
         [HttpPost("profile/avatar")]
         public async Task<IActionResult> UploadAvatar(IFormFile file)
