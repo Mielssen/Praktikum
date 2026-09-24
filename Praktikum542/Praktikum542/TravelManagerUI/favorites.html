@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Praktikum542 | Обране</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .fav-card { position: relative; }
+        .btn-remove-fav {
+            background: #ff6b81; color: #fff; border: none;
+            padding: 8px 14px; border-radius: 10px; cursor: pointer; font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <h2>Travel<span>Manager</span></h2>
+    <div style="display:flex; gap:15px; align-items:center;">
+        <a href="dashboard.html" style="text-decoration:none; font-weight:bold; color:#2d3436;">🏠 Головна</a>
+        <a href="profile.html" style="text-decoration:none; font-weight:bold; color:#2d3436;">👤 Кабінет</a>
+        <button class="logout-btn" onclick="logout()">Вийти</button>
+    </div>
+</div>
+
+<div class="container">
+    <h3 class="section-title">Обране</h3>
+    <div id="favoritesGrid" class="grid"></div>
+</div>
+
+<script src="favorites.js"></script>
+</body>
+</html>
