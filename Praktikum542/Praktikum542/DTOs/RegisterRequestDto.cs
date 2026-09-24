@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
+﻿using System.ComponentModel.DataAnnotations;
+
 namespace Praktikum542.DTOs
 {
     public class RegisterRequestDto
@@ -29,6 +29,5 @@ namespace Praktikum542.DTOs
         public string Phone { get; set; }
 
         public string PassportData { get; set; }
-        public IFormFile? Avatar { get; set; }
     }
 }
