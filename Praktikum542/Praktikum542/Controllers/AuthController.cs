@@ -225,7 +225,7 @@ namespace Praktikum542.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            
+            return $"/avatars/{fileName}";
         }
     }
 }
