@@ -15,11 +15,10 @@ namespace Praktikum542.Services
             _logger = logger;
         }
 
-        public List<ProfileDto> GetAllUsers(string? role, string? status)
+        public List<ProfileDto> GetAllUsers(string? role, string? status, string? search = null)
         {
-            _logger.LogInformation("Запит списку користувачів. Role={Role}, Status={Status}", role, status);
-
-            return _repo.GetAllUsers(role, status).Select(MapToDto).ToList();
+            _logger.LogInformation("Запит списку користувачів. Role={Role}, Status={Status}, Search={Search}", role, status, search);
+            return _repo.GetAllUsers(role, status, search).Select(MapToDto).ToList();
         }
 
         public ProfileDto GetUserById(int credentialId)

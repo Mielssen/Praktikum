@@ -1,4 +1,5 @@
 ﻿using Praktikum542.Models;
+using Praktikum542.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Praktikum542.Repositories
@@ -12,18 +13,16 @@ namespace Praktikum542.Repositories
             _context = context;
         }
 
-        public List<Credential> GetAllUsers(string? role, string? status)
+        public List<Credential> GetAllUsers(string? role, string? status, string? search = null)
         {
             var query = _context.Credentials
                 .Include(c => c.UserDetail)
                 .AsQueryable();
-
             if (!string.IsNullOrWhiteSpace(role))
                 query = query.Where(c => c.Role == role);
-
             if (!string.IsNullOrWhiteSpace(status))
                 query = query.Where(c => c.Status == status);
-
+            query = query.ApplySearch(search);
             return query.OrderBy(c => c.CreatedAt).ToList();
         }
 
