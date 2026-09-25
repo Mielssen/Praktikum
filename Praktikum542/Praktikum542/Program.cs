@@ -94,6 +94,8 @@ builder.Services.AddScoped<TourRepository>();
 builder.Services.AddScoped<TourService>();
 builder.Services.AddScoped<AdminRepository>();
 builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<PasswordResetRepository>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 
@@ -139,7 +141,7 @@ app.UseExceptionHandler(errorApp =>
         else
         {
             context.Response.StatusCode = 500;
-            logger.LogError(exception, "Необроблена помилка сервера");
+            logger.LogError(exception, "ГЌГҐГ®ГЎГ°Г®ГЎГ«ГҐГ­Г  ГЇГ®Г¬ГЁГ«ГЄГ  Г±ГҐГ°ГўГҐГ°Г ");
             await context.Response.WriteAsJsonAsync(new ApiErrorResponse
             {
                 Message = "Internal server error"
@@ -163,7 +165,7 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseAuthorization();
-    
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
