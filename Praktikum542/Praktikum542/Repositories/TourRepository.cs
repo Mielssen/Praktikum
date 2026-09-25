@@ -49,5 +49,32 @@ namespace Praktikum542.Repositories
             _context.Tours.Remove(tour);
             _context.SaveChanges();
         }
+        public List<Tour> Filter(string? search, decimal? minPrice, decimal? maxPrice,
+    int? minDays, int? maxDays, int? typeId)
+        {
+            var query = _context.Tours
+                .Include(t => t.TourAssets)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+                query = query.Where(t => t.Name.Contains(search) || t.Description.Contains(search));
+
+            if (minPrice.HasValue)
+                query = query.Where(t => t.Price >= minPrice.Value);
+
+            if (maxPrice.HasValue)
+                query = query.Where(t => t.Price <= maxPrice.Value);
+
+            if (minDays.HasValue)
+                query = query.Where(t => t.DurationDays >= minDays.Value);
+
+            if (maxDays.HasValue)
+                query = query.Where(t => t.DurationDays <= maxDays.Value);
+
+            if (typeId.HasValue)
+                query = query.Where(t => t.TypeId == typeId.Value);
+
+            return query.ToList();
+        }
     }
 }

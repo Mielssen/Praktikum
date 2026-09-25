@@ -1,17 +1,18 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Praktikum542.Exceptions;
+using Praktikum542.Middleware;
 using Praktikum542.Models;
 using Praktikum542.Repositories;
 using Praktikum542.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.OpenApi.Models;
-using Praktikum542.Exceptions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Diagnostics;
-using Praktikum542.Middleware;
-using Microsoft.Extensions.Logging;
 using Serilog;
+using System.Text;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -83,6 +84,8 @@ builder.WebHost.ConfigureKestrel(options =>
 
 builder.Services.AddScoped<SavedPersonRepository>();
 builder.Services.AddScoped<SavedPersonService>();
+builder.Services.AddScoped<FavoriteRepository>();
+builder.Services.AddScoped<FavoriteService>();
 builder.Services.AddScoped<BookingRepository>();
 builder.Services.AddScoped<BookingService>();
 builder.Services.AddScoped<CredentialsRepository>();
@@ -138,7 +141,7 @@ app.UseExceptionHandler(errorApp =>
         else
         {
             context.Response.StatusCode = 500;
-            logger.LogError(exception, "Íåîáðîáëåíà ïîìèëêà ñåðâåðà");
+            logger.LogError(exception, "ÃÃ¥Ã®Ã¡Ã°Ã®Ã¡Ã«Ã¥Ã­Ã  Ã¯Ã®Ã¬Ã¨Ã«ÃªÃ  Ã±Ã¥Ã°Ã¢Ã¥Ã°Ã ");
             await context.Response.WriteAsJsonAsync(new ApiErrorResponse
             {
                 Message = "Internal server error"
@@ -146,8 +149,14 @@ app.UseExceptionHandler(errorApp =>
         }
     });
 });
-
+app.UseDefaultFiles();
 app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "TravelManagerUI")),
+    RequestPath = "" 
+});
 
 app.UseHttpsRedirection();
 
@@ -162,8 +171,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Praktikum542 v1");
-        c.RoutePrefix = string.Empty;
+        c.RoutePrefix = "swagger"; 
     });
 }
 

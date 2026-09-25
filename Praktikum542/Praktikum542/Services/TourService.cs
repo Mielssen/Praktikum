@@ -216,5 +216,30 @@ namespace Praktikum542.Services
             _repo.Delete(tour);
             _logger.LogInformation("Видалено тур ID={TourId}", id);
         }
+
+        public List<TourDto> Filter(string? search, decimal? minPrice, decimal? maxPrice,
+    int? minDays, int? maxDays, int? typeId)
+        {
+            var tours = _repo.Filter(search, minPrice, maxPrice, minDays, maxDays, typeId);
+
+            return tours.Select(t => new TourDto
+            {
+                TourId = t.TourId,
+                Name = t.Name,
+                Description = t.Description,
+                Price = t.Price,
+                DurationDays = t.DurationDays,
+                AvailableFrom = t.AvailableFrom,
+                AvailableTo = t.AvailableTo,
+                TypeId = t.TypeId,
+                Assets = t.TourAssets != null
+                    ? t.TourAssets.Select(a => new TourAssetDto
+                    {
+                        AssetType = a.AssetType,
+                        Url = a.Url
+                    }).ToList()
+                    : new List<TourAssetDto>()
+            }).ToList();
+        }
     }
 }

@@ -1,6 +1,7 @@
 const API_TOURS = "https://localhost:7227/api/tours";
 const API_BOOKINGS = "https://localhost:7227/api/bookings";
 const API_SAVED_PERSONS = "https://localhost:7227/api/savedpersons";
+const API_FAVORITES = "https://localhost:7227/api/favorites";
 const token = localStorage.getItem("token");
 
 let tourTypes = [];
@@ -10,6 +11,7 @@ let sliderIndex = 0;
 let sliderItems = [];
 let savedPersons = [];
 let currentPersonIndex = null;
+let favoriteTourIds = new Set();
 
 if (!token) {
     window.location.href = "index.html";
@@ -18,6 +20,14 @@ if (!token) {
 async function loadTourTypes() {
     const res = await fetch(API_TOURS + "/types");
     tourTypes = await res.json();
+
+    const select = document.getElementById("filterType");
+    tourTypes.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t.typeId;
+        opt.innerText = t.name;
+        select.appendChild(opt);
+    });
 }
 
 async function loadTours() {
@@ -33,6 +43,60 @@ async function loadSavedPersons() {
     savedPersons = await res.json();
 }
 
+async function loadFavorites() {
+    const res = await fetch(API_FAVORITES, {
+        headers: { "Authorization": "Bearer " + token }
+    });
+    const data = await res.json();
+    favoriteTourIds = new Set(data.map(f => f.tourId));
+}
+
+async function toggleFavorite(tourId, btn) {
+    const isFav = favoriteTourIds.has(tourId);
+
+    const res = await fetch(
+        isFav ? `${API_FAVORITES}/${tourId}` : API_FAVORITES,
+        {
+            method: isFav ? "DELETE" : "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: isFav ? undefined : JSON.stringify({ tourId })
+        }
+    );
+
+    if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        alert(err?.message || "Помилка");
+        return;
+    }
+
+    if (isFav) {
+        favoriteTourIds.delete(tourId);
+        if (btn) btn.innerText = "🤍";
+    } else {
+        favoriteTourIds.add(tourId);
+        if (btn) btn.innerText = "❤️";
+    }
+
+    updateModalFavButton();
+}
+
+function updateModalFavButton() {
+    const btn = document.getElementById("modalFavBtn");
+    if (!btn || !currentTour) return;
+
+    const isFav = favoriteTourIds.has(currentTour.tourId);
+    btn.innerText = isFav ? "❤️ В обраному" : "🤍 В обране";
+    btn.classList.toggle("active", isFav);
+}
+
+function toggleFavoriteFromModal() {
+    if (!currentTour) return;
+    toggleFavorite(currentTour.tourId, null).then(updateModalFavButton);
+}
+
 function formatDate(dateString) {
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString("uk-UA", {
@@ -43,6 +107,11 @@ function formatDate(dateString) {
 function renderTours(list) {
     const grid = document.getElementById("toursGrid");
     grid.innerHTML = "";
+
+    if (list.length === 0) {
+        grid.innerHTML = "<p style='color:#636e72;'>Турів за цими критеріями не знайдено</p>";
+        return;
+    }
 
     list.forEach(t => {
         const card = document.createElement("div");
@@ -58,6 +127,9 @@ function renderTours(list) {
 
         card.innerHTML = `
             ${imgHtml}
+            <button class="fav-heart" data-tour-id="${t.tourId}">
+                ${favoriteTourIds.has(t.tourId) ? "❤️" : "🤍"}
+            </button>
             <div class="tour-card-body">
                 <div class="tour-card-type">${typeName}</div>
                 <h4>${t.name}</h4>
@@ -72,6 +144,10 @@ function renderTours(list) {
         `;
 
         card.querySelector(".btn-view").onclick = () => openTourModal(t);
+        card.querySelector(".fav-heart").onclick = (e) => {
+            e.stopPropagation();
+            toggleFavorite(t.tourId, e.currentTarget);
+        };
         grid.appendChild(card);
     });
 }
@@ -94,6 +170,7 @@ function openTourModal(tour) {
     document.getElementById("bookingTourName").innerText = tour.name;
 
     renderSlider();
+    updateModalFavButton();
     document.getElementById("tourModal").classList.remove("hidden");
 }
 
@@ -489,23 +566,59 @@ async function cancelBooking(id) {
     loadBookings();
 }
 
-function searchTours() {
-    const value = document.getElementById("search").value.trim();
-    if (!value) return;
+function buildFilterParams() {
+    const params = new URLSearchParams();
 
-    fetch(`${API_TOURS}?search=${encodeURIComponent(value)}`)
-        .then(r => r.json())
-        .then(data => {
-            renderTours(data);
-            document.getElementById("searchText").innerText = value;
-            document.getElementById("searchChip").classList.remove("hidden");
-        });
+    const search = document.getElementById("search").value.trim();
+    const typeId = document.getElementById("filterType").value;
+    const minPrice = document.getElementById("filterMinPrice").value;
+    const maxPrice = document.getElementById("filterMaxPrice").value;
+    const minDays = document.getElementById("filterMinDays").value;
+    const maxDays = document.getElementById("filterMaxDays").value;
+
+    if (search) params.append("search", search);
+    if (typeId) params.append("typeId", typeId);
+    if (minPrice) params.append("minPrice", minPrice);
+    if (maxPrice) params.append("maxPrice", maxPrice);
+    if (minDays) params.append("minDays", minDays);
+    if (maxDays) params.append("maxDays", maxDays);
+
+    return params.toString();
+}
+
+async function applyFilters() {
+    const query = buildFilterParams();
+    const res = await fetch(`${API_TOURS}?${query}`);
+    const data = await res.json();
+    renderTours(data);
+
+    const search = document.getElementById("search").value.trim();
+    if (search) {
+        document.getElementById("searchText").innerText = search;
+        document.getElementById("searchChip").classList.remove("hidden");
+    } else {
+        document.getElementById("searchChip").classList.add("hidden");
+    }
+}
+
+function resetFilters() {
+    document.getElementById("search").value = "";
+    document.getElementById("filterType").value = "";
+    document.getElementById("filterMinPrice").value = "";
+    document.getElementById("filterMaxPrice").value = "";
+    document.getElementById("filterMinDays").value = "";
+    document.getElementById("filterMaxDays").value = "";
+    document.getElementById("searchChip").classList.add("hidden");
+    loadTours();
+}
+
+function searchTours() {
+    applyFilters();
 }
 
 function clearSearch() {
     document.getElementById("search").value = "";
-    document.getElementById("searchChip").classList.add("hidden");
-    loadTours();
+    applyFilters();
 }
 
 function logout() {
@@ -515,6 +628,7 @@ function logout() {
 
 async function init() {
     await loadTourTypes();
+    await loadFavorites();
     await loadTours();
     await loadBookings();
 }

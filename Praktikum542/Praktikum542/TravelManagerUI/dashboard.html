@@ -4,12 +4,31 @@
     <meta charset="UTF-8">
     <title>Praktikum542 | Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .tour-card { position: relative; }
+        .fav-heart {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(255,255,255,0.9); border: none; border-radius: 50%;
+            width: 34px; height: 34px; font-size: 16px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; z-index: 2;
+        }
+        .btn-fav {
+            background: #fff; border: 2px solid #ff6b81; color: #ff6b81;
+            padding: 10px 16px; border-radius: 10px; font-weight: bold; cursor: pointer;
+        }
+        .btn-fav.active { background: #ff6b81; color: #fff; }
+        .filters-box label { color: #636e72; }
+        .filters-box input, .filters-box select {
+            padding: 8px 10px; border-radius: 8px; border: 1px solid #dfe6e9;
+        }
+    </style>
 </head>
 <body>
 
 <div class="navbar">
     <h2>Travel<span>Manager</span></h2>
     <div style="display:flex; gap:15px; align-items:center;">
+        <a href="favorites.html" style="text-decoration:none; font-weight:bold; color:#2d3436;">❤️ Обране</a>
         <a href="profile.html" style="text-decoration:none; font-weight:bold; color:#2d3436;">👤 Кабінет</a>
         <button class="logout-btn" onclick="logout()">Вийти</button>
     </div>
@@ -25,6 +44,33 @@
                 <button onclick="clearSearch()">✕</button>
             </div>
             <button class="btn-search-inner" onclick="searchTours()">Пошук</button>
+        </div>
+
+        <div class="filters-box" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; align-items:end;">
+            <div>
+                <label style="font-size:12px; display:block;">Тип туру</label>
+                <select id="filterType">
+                    <option value="">Усі</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:12px; display:block;">Ціна від</label>
+                <input id="filterMinPrice" type="number" min="0" style="width:100px;">
+            </div>
+            <div>
+                <label style="font-size:12px; display:block;">Ціна до</label>
+                <input id="filterMaxPrice" type="number" min="0" style="width:100px;">
+            </div>
+            <div>
+                <label style="font-size:12px; display:block;">Днів від</label>
+                <input id="filterMinDays" type="number" min="0" style="width:80px;">
+            </div>
+            <div>
+                <label style="font-size:12px; display:block;">Днів до</label>
+                <input id="filterMaxDays" type="number" min="0" style="width:80px;">
+            </div>
+            <button class="btn-search-inner" onclick="applyFilters()">Застосувати</button>
+            <button class="btn-cancel" onclick="resetFilters()">Скинути</button>
         </div>
     </div>
 
@@ -63,6 +109,7 @@
             </div>
             <div class="modal-actions">
                 <button class="btn-book" onclick="openBookingModal()">Забронювати</button>
+                <button id="modalFavBtn" class="btn-fav" onclick="toggleFavoriteFromModal()">🤍 В обране</button>
                 <button class="btn-close" onclick="closeTourModal()">Закрити</button>
             </div>
         </div>
