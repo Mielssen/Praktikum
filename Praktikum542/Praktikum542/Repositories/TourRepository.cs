@@ -17,13 +17,15 @@ namespace Praktikum542.Repositories
             _context.Tours.Add(tour);
             _context.SaveChanges();
         }
+
         public List<Tour> Search(string query)
         {
             return _context.Tours
                 .Include(t => t.TourAssets)
-                .Where(t => t.Name.Contains(query) || t.Description.Contains(query))
+                .Where(t => t.Name.Contains(query) || (t.Description != null && t.Description.Contains(query)))
                 .ToList();
         }
+
         public List<Tour> GetAll()
         {
             return _context.Tours
@@ -49,15 +51,23 @@ namespace Praktikum542.Repositories
             _context.Tours.Remove(tour);
             _context.SaveChanges();
         }
-        public List<Tour> Filter(string? search, decimal? minPrice, decimal? maxPrice,
-    int? minDays, int? maxDays, int? typeId)
+
+        public (List<Tour> Items, int TotalCount) Filter(
+            string? search,
+            decimal? minPrice,
+            decimal? maxPrice,
+            int? minDays,
+            int? maxDays,
+            int? typeId,
+            int page = 1,
+            int pageSize = 6)
         {
             var query = _context.Tours
                 .Include(t => t.TourAssets)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
-                query = query.Where(t => t.Name.Contains(search) || t.Description.Contains(search));
+                query = query.Where(t => t.Name.Contains(search) || (t.Description != null && t.Description.Contains(search)));
 
             if (minPrice.HasValue)
                 query = query.Where(t => t.Price >= minPrice.Value);
@@ -74,7 +84,19 @@ namespace Praktikum542.Repositories
             if (typeId.HasValue)
                 query = query.Where(t => t.TypeId == typeId.Value);
 
-            return query.ToList();
+            int totalCount = query.Count();
+
+     
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 6;
+
+            var items = query
+                .OrderBy(t => t.TourId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return (items, totalCount);
         }
     }
 }

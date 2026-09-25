@@ -42,14 +42,16 @@ namespace Praktikum542.Controllers
 
         [HttpGet]
         public IActionResult GetAll(
-    [FromQuery] string? search,
-    [FromQuery] decimal? minPrice,
-    [FromQuery] decimal? maxPrice,
-    [FromQuery] int? minDays,
-    [FromQuery] int? maxDays,
-    [FromQuery] int? typeId)
+            [FromQuery] string? search,
+            [FromQuery] decimal? minPrice,
+            [FromQuery] decimal? maxPrice,
+            [FromQuery] int? minDays,
+            [FromQuery] int? maxDays,
+            [FromQuery] int? typeId,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 6)
         {
-            return Ok(_service.Filter(search, minPrice, maxPrice, minDays, maxDays, typeId));
+            return Ok(_service.Filter(search, minPrice, maxPrice, minDays, maxDays, typeId, page, pageSize));
         }
 
         [Authorize(Roles = "manager")]

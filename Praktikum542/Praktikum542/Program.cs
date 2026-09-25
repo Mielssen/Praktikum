@@ -19,174 +19,193 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
-var builder = WebApplication.CreateBuilder(args);
-builder.Host.UseSerilog();
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.Configure<ApiBehaviorOptions>(options =>
+try
 {
-    options.SuppressModelStateInvalidFilter = false;
-});
+    var builder = WebApplication.CreateBuilder(args);
+    builder.Host.UseSerilog();
 
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+
+    builder.Services.Configure<ApiBehaviorOptions>(options =>
     {
-        Title = "Praktikum542 API",
-        Version = "v1",
-        Description = "API для сервісу бронювання турів TravelManager"
+        options.SuppressModelStateInvalidFilter = false;
     });
 
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    builder.Services.AddSwaggerGen(c =>
     {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+        c.SwaggerDoc("v1", new OpenApiInfo
         {
-            new OpenApiSecurityScheme
+            Title = "Praktikum542 API",
+            Version = "v1",
+            Description = "API для сервісу бронювання турів TravelManager"
+        });
+
+        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Введіть JWT токен (без префікса 'Bearer')"
+        });
+
+        c.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
             {
-                Reference = new OpenApiReference
+                new OpenApiSecurityScheme
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
 
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))
-        c.IncludeXmlComments(xmlPath);
-});
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod());
-});
-
-builder.Services.AddDbContext<PraktikumContext>(options =>
-{
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 0))
-    );
-});
-
-builder.Services.Configure<IISServerOptions>(options =>
-{
-    options.MaxRequestBodySize = 500_000_000;
-});
-
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.Limits.MaxRequestBodySize = 500_000_000;
-});
-
-builder.Services.AddScoped<SavedPersonRepository>();
-builder.Services.AddScoped<SavedPersonService>();
-builder.Services.AddScoped<FavoriteRepository>();
-builder.Services.AddScoped<FavoriteService>();
-builder.Services.AddScoped<BookingRepository>();
-builder.Services.AddScoped<BookingService>();
-builder.Services.AddScoped<CredentialsRepository>();
-builder.Services.AddScoped<AuthentificationService>();
-builder.Services.AddScoped<TourRepository>();
-builder.Services.AddScoped<TourService>();
-builder.Services.AddScoped<AdminRepository>();
-builder.Services.AddScoped<AdminService>();
-builder.Services.AddScoped<PasswordResetRepository>();
-builder.Services.AddScoped<IEmailService, SmtpEmailService>();
-
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtSettings["Key"]))
-    };
-});
-
-var app = builder.Build();
-
-app.UseExceptionHandler(errorApp =>
-{
-    errorApp.Run(async context =>
-    {
-        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-        var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
-
-        if (exception is AppException appEx)
+        var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        if (File.Exists(xmlPath))
         {
-            context.Response.StatusCode = 400;
-            logger.LogWarning("AppException: Code={Code}, Message={Message}", appEx.Code, appEx.Message);
-            await context.Response.WriteAsJsonAsync(new ApiErrorResponse
-            {
-                Message = appEx.Message,
-                Code = appEx.Code
-            });
-        }
-        else
-        {
-            context.Response.StatusCode = 500;
-            logger.LogError(exception, "Íåîáðîáëåíà ïîìèëêà ñåðâåðà");
-            await context.Response.WriteAsJsonAsync(new ApiErrorResponse
-            {
-                Message = "Internal server error"
-            });
+            c.IncludeXmlComments(xmlPath);
         }
     });
-});
-app.UseDefaultFiles();
-app.UseStaticFiles();
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "TravelManagerUI")),
-    RequestPath = "" 
-});
 
-app.UseHttpsRedirection();
-
-app.UseCors("AllowAll");
-
-app.UseAuthentication();
-app.UseMiddleware<RequestLoggingMiddleware>();
-app.UseAuthorization();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
+    builder.Services.AddCors(options =>
     {
-        c.RoutePrefix = "swagger"; 
+        options.AddPolicy("AllowAll",
+            policy => policy.AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod());
     });
+
+    builder.Services.AddDbContext<PraktikumContext>(options =>
+    {
+        options.UseMySql(
+            builder.Configuration.GetConnectionString("DefaultConnection"),
+            new MySqlServerVersion(new Version(8, 0, 0))
+        );
+    });
+
+    builder.Services.Configure<IISServerOptions>(options =>
+    {
+        options.MaxRequestBodySize = 500_000_000;
+    });
+
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.Limits.MaxRequestBodySize = 500_000_000;
+    });
+
+    builder.Services.AddScoped<SavedPersonRepository>();
+    builder.Services.AddScoped<SavedPersonService>();
+    builder.Services.AddScoped<FavoriteRepository>();
+    builder.Services.AddScoped<FavoriteService>();
+    builder.Services.AddScoped<BookingRepository>();
+    builder.Services.AddScoped<BookingService>();
+    builder.Services.AddScoped<CredentialsRepository>();
+    builder.Services.AddScoped<AuthentificationService>();
+    builder.Services.AddScoped<TourRepository>();
+    builder.Services.AddScoped<TourService>();
+    builder.Services.AddScoped<AdminRepository>();
+    builder.Services.AddScoped<AdminService>();
+    builder.Services.AddScoped<PasswordResetRepository>();
+    builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+
+    var jwtSettings = builder.Configuration.GetSection("Jwt");
+
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
+        };
+    });
+
+    var app = builder.Build();
+
+    app.UseExceptionHandler(errorApp =>
+    {
+        errorApp.Run(async context =>
+        {
+            var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+            var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+            if (exception is AppException appEx)
+            {
+                context.Response.StatusCode = 400;
+                logger.LogWarning("AppException: Code={Code}, Message={Message}", appEx.Code, appEx.Message);
+                await context.Response.WriteAsJsonAsync(new ApiErrorResponse
+                {
+                    Message = appEx.Message,
+                    Code = appEx.Code
+                });
+            }
+            else
+            {
+                context.Response.StatusCode = 500;
+                logger.LogError(exception, "Необроблена помилка сервера");
+                await context.Response.WriteAsJsonAsync(new ApiErrorResponse
+                {
+                    Message = "Internal server error"
+                });
+            }
+        });
+    });
+
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+
+    var uiPath = Path.Combine(builder.Environment.ContentRootPath, "TravelManagerUI");
+    if (Directory.Exists(uiPath))
+    {
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(uiPath),
+            RequestPath = ""
+        });
+    }
+
+    app.UseHttpsRedirection();
+    app.UseCors("AllowAll");
+
+    app.UseAuthentication();
+    app.UseMiddleware<RequestLoggingMiddleware>();
+    app.UseAuthorization();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Praktikum542 API v1");
+            c.RoutePrefix = "swagger";
+        });
+    }
+
+    app.MapControllers();
+    app.Run();
 }
-
-app.MapControllers();
-
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Додаток неочікувано завершив роботу");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

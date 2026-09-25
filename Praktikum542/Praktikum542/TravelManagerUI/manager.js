@@ -77,9 +77,9 @@ document.getElementById("files")?.addEventListener("change", (e) => {
 });
 
 async function loadTours() {
-    const res = await fetch(API);
+    const res = await fetch(API + "?page=1&pageSize=100");
     const data = await res.json();
-    renderTours(data);
+    renderTours(data.items || data);
 }
 
 function formatDate(dateString) {
@@ -107,21 +107,21 @@ function renderTours(list) {
             mediaHtml = `
                 <div style="display:flex; gap:6px; margin:10px 0; flex-wrap:wrap;">
                     ${mediaAssets.map(a => {
-                        if (a.assetType === "image") {
-                            return `<img src="${a.url}" style="
+                if (a.assetType === "image") {
+                    return `<img src="${a.url}" style="
                                 width:60px; height:60px;
                                 object-fit:cover;
                                 border-radius:10px;
                                 border:1px solid #eee;">`;
-                        } else if (a.assetType === "video") {
-                            return `<video src="${a.url}" style="
+                } else if (a.assetType === "video") {
+                    return `<video src="${a.url}" style="
                                 width:100px; height:60px;
                                 object-fit:cover;
                                 border-radius:10px;"
                                 controls></video>`;
-                        }
-                        return "";
-                    }).join("")}
+                }
+                return "";
+            }).join("")}
                 </div>
             `;
         }
@@ -162,10 +162,10 @@ function searchTours() {
     const value = document.getElementById("search").value.trim();
     if (!value) return;
 
-    fetch(`${API}?search=${encodeURIComponent(value)}`)
+    fetch(`${API}?search=${encodeURIComponent(value)}&page=1&pageSize=100`)
         .then(r => r.json())
         .then(data => {
-            renderTours(data);
+            renderTours(data.items || data);
             document.getElementById("searchText").innerText = value;
             document.getElementById("searchChip").classList.remove("hidden");
         });

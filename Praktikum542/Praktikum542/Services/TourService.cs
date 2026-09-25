@@ -10,6 +10,7 @@ namespace Praktikum542.Services
         private readonly TourRepository _repo;
         private readonly PraktikumContext _context;
         private readonly ILogger<TourService> _logger;
+
         public TourService(TourRepository repo, PraktikumContext context, ILogger<TourService> logger)
         {
             _repo = repo;
@@ -44,7 +45,7 @@ namespace Praktikum542.Services
 
         public void UpdateTour(int id, CreateTourDto dto)
         {
-            var tour = _repo.GetById(id);   
+            var tour = _repo.GetById(id);
 
             if (tour == null)
                 throw new AppException("NOT_FOUND", "Тур не знайдено");
@@ -146,6 +147,7 @@ namespace Praktikum542.Services
                     : new List<TourAssetDto>()
             };
         }
+
         public List<TourDto> Search(string query)
         {
             var tours = _repo.Search(query);
@@ -169,6 +171,7 @@ namespace Praktikum542.Services
                     : new List<TourAssetDto>()
             }).ToList();
         }
+
         public void AddAsset(int tourId, string url, string assetType)
         {
             var tour = _repo.GetById(tourId);
@@ -185,6 +188,7 @@ namespace Praktikum542.Services
 
             _context.SaveChanges();
         }
+
         public void DeleteTour(int id)
         {
             var tour = _repo.GetById(id);
@@ -217,12 +221,19 @@ namespace Praktikum542.Services
             _logger.LogInformation("Видалено тур ID={TourId}", id);
         }
 
-        public List<TourDto> Filter(string? search, decimal? minPrice, decimal? maxPrice,
-    int? minDays, int? maxDays, int? typeId)
+        public PagedResultDto<TourDto> Filter(
+            string? search,
+            decimal? minPrice,
+            decimal? maxPrice,
+            int? minDays,
+            int? maxDays,
+            int? typeId,
+            int page = 1,
+            int pageSize = 6)
         {
-            var tours = _repo.Filter(search, minPrice, maxPrice, minDays, maxDays, typeId);
+            var (tours, totalCount) = _repo.Filter(search, minPrice, maxPrice, minDays, maxDays, typeId, page, pageSize);
 
-            return tours.Select(t => new TourDto
+            var tourDtos = tours.Select(t => new TourDto
             {
                 TourId = t.TourId,
                 Name = t.Name,
@@ -240,6 +251,14 @@ namespace Praktikum542.Services
                     }).ToList()
                     : new List<TourAssetDto>()
             }).ToList();
+
+            return new PagedResultDto<TourDto>
+            {
+                Items = tourDtos,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
     }
 }
