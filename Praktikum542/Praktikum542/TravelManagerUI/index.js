@@ -1,4 +1,4 @@
-﻿const API = "https://localhost:7227/api/auth";
+﻿const API = "http://localhost:5265/api/auth";
 
 function get(id) {
     return document.getElementById(id);

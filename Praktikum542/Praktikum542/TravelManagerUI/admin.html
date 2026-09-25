@@ -32,6 +32,9 @@
     <!-- КОРИСТУВАЧІ -->
     <div id="tab-clients" class="hidden">
         <div class="toolbar">
+            <div class="search-box">
+                <input id="clientSearch" placeholder="Пошук за ім'ям або email..." oninput="onClientSearchInput()">
+            </div>
             <div class="filter-tabs">
                 <button class="filter-btn active" onclick="filterUsers('client', null, this)">Всі</button>
                 <button class="filter-btn" onclick="filterUsers('client', 'active', this)">Активні</button>
@@ -44,6 +47,9 @@
     <!-- МЕНЕДЖЕРИ -->
     <div id="tab-managers" class="hidden">
         <div class="toolbar">
+            <div class="search-box">
+                <input id="managerSearch" placeholder="Пошук за ім'ям або email..." oninput="onManagerSearchInput()">
+            </div>
             <div class="filter-tabs">
                 <button class="filter-btn active" onclick="filterUsers('manager', null, this)">Всі</button>
                 <button class="filter-btn" onclick="filterUsers('manager', 'active', this)">Активні</button>

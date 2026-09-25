@@ -25,9 +25,9 @@ namespace Praktikum542.Controllers
             int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
         [HttpGet("users")]
-        public IActionResult GetAll([FromQuery] string? role, [FromQuery] string? status)
+        public IActionResult GetAll([FromQuery] string? role, [FromQuery] string? status, [FromQuery] string? search)
         {
-            return Ok(_service.GetAllUsers(role, status));
+            return Ok(_service.GetAllUsers(role, status, search));
         }
 
         [HttpGet("users/{id}")]

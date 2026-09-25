@@ -1,4 +1,4 @@
-const API = "https://localhost:7227/api";
+const API = "http://localhost:5265/api";
 
 function getToken() { return localStorage.getItem("token"); }
 function authHeaders() {
@@ -89,9 +89,39 @@ async function loadStatistics() {
     `).join("") || "<p class='empty-state'>Немає даних</p>";
 }
 
+let userSearchTimeout = null;
+
+function onClientSearchInput() {
+    clearTimeout(userSearchTimeout);
+    userSearchTimeout = setTimeout(() => {
+        const activeBtn = document.querySelector("#tab-clients .filter-btn.active");
+        const onclickAttr = activeBtn ? activeBtn.getAttribute("onclick") : "";
+        const match = onclickAttr.match(/'([^']+)'/g);
+        const status = match && match[1] ? match[1].replace(/'/g, "") : null;
+        loadUsers("client", status === "null" ? null : status);
+    }, 300);
+}
+
+function onManagerSearchInput() {
+    clearTimeout(userSearchTimeout);
+    userSearchTimeout = setTimeout(() => {
+        const activeBtn = document.querySelector("#tab-managers .filter-btn.active");
+        const onclickAttr = activeBtn ? activeBtn.getAttribute("onclick") : "";
+        const match = onclickAttr.match(/'([^']+)'/g);
+        const status = match && match[1] ? match[1].replace(/'/g, "") : null;
+        loadUsers("manager", status === "null" ? null : status);
+    }, 300);
+}
+
 async function loadUsers(role, status) {
     let url = `${API}/admin/users?role=${role}`;
     if (status) url += `&status=${status}`;
+
+    const searchInputId = role === "client" ? "clientSearch" : "managerSearch";
+    const searchValue = document.getElementById(searchInputId)?.value.trim();
+    if (searchValue) {
+        url += `&search=${encodeURIComponent(searchValue)}`;
+    }
 
     const res = await fetch(url, { headers: authHeaders() });
     if (!res.ok) return;
