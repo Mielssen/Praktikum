@@ -1,4 +1,4 @@
-﻿using Praktikum542.Models;
+using Praktikum542.Models;
 using Praktikum542.Repositories;
 using Praktikum542.Exceptions;
 using Praktikum542.DTOs;
@@ -169,27 +169,72 @@ namespace Praktikum542.Services
                 }).ToList()
             }).ToList();
         }
-        public void Cancel(int credentialId, int bookingId)
+        public decimal Cancel(int credentialId, int bookingId)
         {
             var booking = _repo.GetById(bookingId);
 
             if (booking == null)
-                throw new AppException("NOT_FOUND", "Бронювання не знайдено");
+                throw new AppException(
+                    "NOT_FOUND",
+                    "Бронювання не знайдено"
+                );
 
             if (booking.CredentialId != credentialId)
-                throw new AppException("FORBIDDEN", "Це не ваше бронювання");
+                throw new AppException(
+                    "FORBIDDEN",
+                    "Це не ваше бронювання"
+                );
 
             if (booking.Status == "cancelled")
-                throw new AppException("ALREADY_CANCELLED", "Бронювання вже скасовано");
+                throw new AppException(
+                    "ALREADY_CANCELLED",
+                    "Бронювання вже скасовано"
+                );
 
-            _context.BookingPersons.RemoveRange(
-                _context.BookingPersons.Where(p => p.BookingId == bookingId)
-            );
-            _repo.Delete(booking);
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            if (booking.StartDate < today)
+                throw new AppException(
+                    "INVALID_CANCELLATION",
+                    "Неможливо скасувати бронювання після початку туру"
+                );
+
+            var daysUntilStart =
+                booking.StartDate.DayNumber - today.DayNumber;
+
+            decimal penaltyAmount = 0;
+
+            if (daysUntilStart < 3)
+            {
+                penaltyAmount = booking.TotalPrice * 0.30m;
+
+                var penalty = new Penalty
+                {
+                    BookingId = booking.BookingId,
+                    Amount = penaltyAmount,
+                    IsPaid = false
+                };
+
+                _context.Penalties.Add(penalty);
+
+                _logger.LogInformation(
+                    "Нараховано штраф для бронювання ID={BookingId}: {PenaltyAmount}",
+                    bookingId,
+                    penaltyAmount
+                );
+            }
+
+            booking.Status = "cancelled";
+
+            _context.SaveChanges();
+
             _logger.LogInformation(
                 "Бронювання ID={BookingId} скасовано користувачем ID={UserId}",
-                bookingId, credentialId);
-        }
+                bookingId,
+                credentialId
+            );
 
+            return penaltyAmount;
+        }
     }
 }
