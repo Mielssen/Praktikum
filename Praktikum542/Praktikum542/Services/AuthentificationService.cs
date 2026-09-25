@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Praktikum542.DTOs;
 using Praktikum542.Models;
@@ -13,12 +14,17 @@ namespace Praktikum542.Services
     public class AuthentificationService
     {
         private readonly CredentialsRepository _repo;
-        private readonly IConfiguration _configuration;
-        private readonly ILogger<AuthentificationService> _logger;
         private readonly PasswordResetRepository _resetRepo;
         private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthentificationService> _logger;
 
-        public AuthentificationService(CredentialsRepository repo, PasswordResetRepository resetRepo, IEmailService emailService, IConfiguration configuration, ILogger<AuthentificationService> logger)
+        public AuthentificationService(
+            CredentialsRepository repo,
+            PasswordResetRepository resetRepo,
+            IEmailService emailService,
+            IConfiguration configuration,
+            ILogger<AuthentificationService> logger)
         {
             _repo = repo;
             _resetRepo = resetRepo;
@@ -40,7 +46,7 @@ namespace Praktikum542.Services
             {
                 throw new AppException("INVALID_EMAIL", "Невірний формат пошти");
             }
-        }   
+        }
 
         private string NormalizePhone(string phone)
         {
@@ -122,7 +128,7 @@ namespace Praktikum542.Services
                 CreatedAt = DateTime.Now
             };
 
-            _repo.Register(user); 
+            _repo.Register(user);
 
             if (user.CredentialId == 0)
                 throw new AppException("DB_ERROR", "User not saved correctly");
@@ -176,6 +182,7 @@ namespace Praktikum542.Services
                 Token = GenerateJwtToken(user)
             };
         }
+
         public async Task ForgotPassword(ForgotPasswordDto dto)
         {
             var email = dto.Email?.Trim().ToLower();
@@ -186,17 +193,18 @@ namespace Praktikum542.Services
             if (user == null)
             {
                 _logger.LogInformation("Forgot-password для неіснуючого email: {Email}", email);
-                return;
+                return; // не розкриваємо існування акаунта
             }
 
             _resetRepo.InvalidateOldTokens(user.CredentialId);
 
-            var token = GenerateResetToken();
+            var token = GenerateResetToken();       // сирий токен — іде в лист
+            var tokenHash = HashToken(token);        // хеш — іде в БД
 
             _resetRepo.Add(new PasswordResetToken
             {
                 CredentialId = user.CredentialId,
-                Token = token,
+                Token = tokenHash,
                 ExpiresAt = DateTime.Now.AddMinutes(30),
                 Used = false,
                 CreatedAt = DateTime.Now
@@ -205,9 +213,9 @@ namespace Praktikum542.Services
             var resetUrl = $"{_configuration["Frontend:ResetPasswordUrl"]}?token={token}";
 
             var body = $@"
-        <p>Ви запросили скидання паролю.</p>
-        <p><a href='{resetUrl}'>Натисніть тут, щоб скинути пароль</a></p>
-        <p>Посилання дійсне 30 хвилин. Якщо це не ви — проігноруйте лист.</p>";
+                <p>Ви запросили скидання паролю.</p>
+                <p><a href='{resetUrl}'>Натисніть тут, щоб скинути пароль</a></p>
+                <p>Посилання дійсне 30 хвилин. Якщо це не ви — проігноруйте лист.</p>";
 
             await _emailService.SendAsync(user.Email, "Скидання паролю", body);
 
@@ -220,9 +228,10 @@ namespace Praktikum542.Services
                 throw new AppException("INVALID_TOKEN", "Токен обов'язковий");
 
             if (string.IsNullOrWhiteSpace(dto.NewPassword) || dto.NewPassword.Length < 6)
-                    throw new AppException("INVALID_PASSWORD", "Пароль має містити мінімум 6 символів");
+                throw new AppException("INVALID_PASSWORD", "Пароль має містити мінімум 6 символів");
 
-            var resetToken = _resetRepo.GetValidToken(dto.Token);
+            var tokenHash = HashToken(dto.Token);
+            var resetToken = _resetRepo.GetValidToken(tokenHash);
             if (resetToken == null)
                 throw new AppException("INVALID_TOKEN", "Токен недійсний або прострочений");
 
@@ -239,9 +248,15 @@ namespace Praktikum542.Services
 
         private string GenerateResetToken()
         {
-            var bytes = System.Security.Cryptography.RandomNumberGenerator.GetBytes(32);
+            var bytes = RandomNumberGenerator.GetBytes(32);
             return Convert.ToBase64String(bytes)
                 .Replace("+", "-").Replace("/", "_").Replace("=", "");
+        }
+
+        private static string HashToken(string token)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+            return Convert.ToBase64String(bytes);
         }
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System.Net;
 using System.Net.Mail;
+
 namespace Praktikum542.Services
 {
-    public class SmtpEmailService: IEmailService
+    public class SmtpEmailService : IEmailService
     {
         private readonly IConfiguration _config;
         private readonly ILogger<SmtpEmailService> _logger;
@@ -21,19 +22,27 @@ namespace Praktikum542.Services
             var pass = _config["Smtp:Password"];
             var from = _config["Smtp:From"] ?? user;
 
-            using var client = new SmtpClient(host, port)
+            try
             {
-                Credentials = new NetworkCredential(user, pass),
-                EnableSsl = true
-            };
+                using var client = new SmtpClient(host, port)
+                {
+                    Credentials = new NetworkCredential(user, pass),
+                    EnableSsl = true
+                };
 
-            var message = new MailMessage(from!, to, subject, htmlBody)
+                var message = new MailMessage(from!, to, subject, htmlBody)
+                {
+                    IsBodyHtml = true
+                };
+
+                await client.SendMailAsync(message);
+                _logger.LogInformation("Лист надіслано на {Email}", to);
+            }
+            catch (Exception ex)
             {
-                IsBodyHtml = true
-            };
+                _logger.LogError(ex, "Не вдалося надіслати лист на {Email}", to);
 
-            await client.SendMailAsync(message);
-            _logger.LogInformation("Лист надіслано на {Email}", to);
+            }
         }
     }
 }
