@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Praktikum542.DTOs;
@@ -180,25 +180,54 @@ namespace Praktikum542.Controllers
         }
 
         /// <summary>
-        /// Скасовує бронювання поточним авторизованим користувачем.
+        /// Скасовує бронювання поточного авторизованого користувача
+        /// та за потреби нараховує штраф.
         /// </summary>
         /// <remarks>
         /// Користувач може скасувати лише власне бронювання.
         ///
+        /// Якщо до початку туру залишилося менше 3 днів,
+        /// система нараховує штраф у розмірі 30% від загальної суми бронювання.
+        ///
+        /// Бронювання не видаляється з бази даних,
+        /// а його статус змінюється на "cancelled".
+        ///
         /// Приклад запиту:
         ///
-        ///     DELETE /api/bookings/10
+        ///     DELETE /api/bookings/28
         ///
-        /// Приклад успішної відповіді (200):
+        /// Приклад успішної відповіді зі штрафом:
         ///
-        ///     "Бронювання скасовано"
+        ///     {
+        ///        "message": "Бронювання скасовано",
+        ///        "penaltyApplied": true,
+        ///        "penaltyAmount": 1260
+        ///     }
+        ///
+        /// Приклад успішної відповіді без штрафу:
+        ///
+        ///     {
+        ///        "message": "Бронювання скасовано",
+        ///        "penaltyApplied": false,
+        ///        "penaltyAmount": 0
+        ///     }
         /// </remarks>
-        /// <param name="id">Ідентифікатор бронювання для скасування.</param>
-        /// <response code="200">Бронювання успішно скасовано.</response>
-        /// <response code="400">Бронювання не знайдено або воно не належить поточному користувачу.</response>
-        /// <response code="401">Користувач не авторизований.</response>
+        /// <param name="id">
+        /// Ідентифікатор бронювання, яке необхідно скасувати.
+        /// </param>
+        /// <response code="200">
+        /// Бронювання успішно скасовано.
+        /// У відповіді вказується, чи був нарахований штраф, та його сума.
+        /// </response>
+        /// <response code="400">
+        /// Бронювання не знайдено, вже скасовано,
+        /// не належить користувачу або дата початку туру вже минула.
+        /// </response>
+        /// <response code="401">
+        /// Користувач не авторизований або JWT-токен недійсний.
+        /// </response>
         [HttpDelete("{id}")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Cancel(int id)
@@ -207,8 +236,14 @@ namespace Praktikum542.Controllers
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value
             );
 
-            _service.Cancel(credentialId, id);
-            return Ok("Бронювання скасовано");
+            var penaltyAmount = _service.Cancel(credentialId, id);
+
+            return Ok(new
+            {
+                message = "Бронювання скасовано",
+                penaltyApplied = penaltyAmount > 0,
+                penaltyAmount
+            });
         }
     }
 }
