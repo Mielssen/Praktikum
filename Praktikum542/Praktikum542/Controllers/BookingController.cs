@@ -39,9 +39,15 @@ namespace Praktikum542.Controllers
 
         [Authorize(Roles = "manager")]
         [HttpGet]
-        public IActionResult GetAll([FromQuery] string? status)
+        public IActionResult GetAll(
+            [FromQuery] string? status, 
+            [FromQuery] int page = 1, 
+            [FromQuery] int pageSize = 10)
         {
-            return Ok(_service.GetAll(status));
+            var allBookings = _service.GetAll(status);
+            var result = allBookings.ApplyPagination(page, pageSize);
+
+            return Ok(result);
         }
 
         [HttpGet("my")]

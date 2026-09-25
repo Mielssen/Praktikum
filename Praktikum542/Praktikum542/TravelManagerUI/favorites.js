@@ -1,4 +1,4 @@
-const API_FAVORITES = "https://localhost:7227/api/favorites";
+const API_FAVORITES = "http://localhost:5265/api/favorites";
 const token = localStorage.getItem("token");
 
 if (!token) {

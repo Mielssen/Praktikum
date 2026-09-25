@@ -1,5 +1,5 @@
-const API = "https://localhost:7227/api/auth";
-const API_BOOKINGS = "https://localhost:7227/api/bookings";
+const API = "http://localhost:5265/api/auth";
+const API_BOOKINGS = "http://localhost:5265/api/bookings";
 const token = localStorage.getItem("token");
 
 if (!token) {

@@ -1,4 +1,4 @@
-const API = "https://localhost:7227/api";
+const API = "http://localhost:5265/api";
 
 function getToken() { return localStorage.getItem("token"); }
 function authHeaders() {

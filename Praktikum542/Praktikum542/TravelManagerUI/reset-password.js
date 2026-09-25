@@ -1,4 +1,4 @@
-const API_AUTH = "https://localhost:7227/api/auth";
+const API_AUTH = "http://localhost:5265/api/auth";
 
 const token = new URLSearchParams(window.location.search).get("token");
 
