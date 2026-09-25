@@ -1,7 +1,7 @@
-const API_TOURS = "https://localhost:7227/api/tours";
-const API_BOOKINGS = "https://localhost:7227/api/bookings";
-const API_SAVED_PERSONS = "https://localhost:7227/api/savedpersons";
-const API_FAVORITES = "https://localhost:7227/api/favorites";
+const API_TOURS = "http://localhost:5265/api/tours";
+const API_BOOKINGS = "http://localhost:5265/api/bookings";
+const API_SAVED_PERSONS = "http://localhost:5265/api/savedpersons";
+const API_FAVORITES = "http://localhost:5265/api/favorites";
 const token = localStorage.getItem("token");
 
 let tourTypes = [];

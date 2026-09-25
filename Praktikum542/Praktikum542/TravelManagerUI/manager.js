@@ -1,4 +1,4 @@
-const API = "https://localhost:7227/api/tours";
+const API = "http://localhost:5265/api/tours";
 const token = localStorage.getItem("token");
 
 let editId = null;
@@ -10,17 +10,20 @@ if (!token) {
 }
 
 async function loadTourTypes() {
-    const res = await fetch("https://localhost:7227/api/tours/types");
+    const res = await fetch("http://localhost:5265/api/tours/types");
     tourTypes = await res.json();
 
     const select = document.getElementById("typeId");
-    select.innerHTML = tourTypes.map(t =>
-        `<option value="${t.typeId}">${t.name}</option>`
-    ).join("");
+    if (select) {
+        select.innerHTML = tourTypes.map(t =>
+            `<option value="${t.typeId}">${t.name}</option>`
+        ).join("");
+    }
 }
 
 function renderPreview() {
     const preview = document.getElementById("preview");
+    if (!preview) return;
     preview.innerHTML = "";
 
     assets.forEach((asset, index) => {
@@ -90,6 +93,7 @@ function formatDate(dateString) {
 
 function renderTours(list) {
     const grid = document.getElementById("toursGrid");
+    if (!grid) return;
     grid.innerHTML = "";
 
     list.forEach(t => {
@@ -97,7 +101,6 @@ function renderTours(list) {
         card.className = "card";
 
         const mediaAssets = t.assets || [];
-
         let mediaHtml = "";
 
         if (mediaAssets.length > 0) {
@@ -302,6 +305,10 @@ async function init() {
     await loadTourTypes();
     await loadTours();
 }
+
+// --- ЛОГІКА ПАГІНАЦІЇ БРОНЮВАНЬ ---
+let currentBookingPage = 1;
+const bookingPageSize = 10;
 let currentStatusFilter = null;
 
 function switchTab(name, btn) {
@@ -312,34 +319,85 @@ function switchTab(name, btn) {
     document.getElementById("tab-" + name).classList.remove("hidden");
     btn.classList.add("active");
 
-    if (name === "bookings") loadBookings();
+    if (name === "bookings") loadBookings(1, currentStatusFilter);
 }
 
-async function loadBookings(status = null) {
+async function loadBookings(page = 1, status = currentStatusFilter) {
+    currentBookingPage = page;
     currentStatusFilter = status;
-    const url = status
-        ? `https://localhost:7227/api/bookings?status=${status}`
-        : `https://localhost:7227/api/bookings`;
+
+    let url = `http://localhost:5265/api/bookings?page=${page}&pageSize=${bookingPageSize}`;
+    if (status) url += `&status=${status}`;
 
     const res = await fetch(url, {
         headers: { "Authorization": "Bearer " + token }
     });
 
+    if (!res.ok) return;
+
     const data = await res.json();
-    renderBookings(data);
+
+    // Обробка PagedResult відповіді з бекенду
+    if (data && data.items) {
+        renderBookings(data.items);
+        renderBookingsPagination(data.page, data.totalPages, data.totalItems);
+    } else if (Array.isArray(data)) {
+        renderBookings(data);
+    }
 }
 
 function filterBookings(status, btn) {
     document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-    loadBookings(status);
+    loadBookings(1, status);
+}
+
+function changeBookingPage(newPage) {
+    loadBookings(newPage, currentStatusFilter);
+}
+
+function renderBookingsPagination(currentPage, totalPages, totalItems) {
+    let container = document.getElementById("bookingsPagination");
+    
+    if (!container) {
+        container = document.createElement("div");
+        container.id = "bookingsPagination";
+        container.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding:10px 0;";
+        const tabBookings = document.getElementById("tab-bookings");
+        if (tabBookings) tabBookings.appendChild(container);
+    }
+
+    if (totalPages <= 1) {
+        container.innerHTML = "";
+        return;
+    }
+
+    container.innerHTML = `
+        <div style="color:#636e72; font-size:14px;">
+            Сторінка <strong>${currentPage}</strong> з <strong>${totalPages}</strong> (Всього: ${totalItems})
+        </div>
+        <div style="display:flex; gap:8px;">
+            <button class="btn-page" ${currentPage <= 1 ? "disabled" : ""} 
+                onclick="changeBookingPage(${currentPage - 1})"
+                style="padding:6px 12px; cursor:pointer; border-radius:6px; border:1px solid #ccc;">
+                &laquo; Назад
+            </button>
+            <span style="padding:6px 12px; font-weight:bold; background:#eee; border-radius:6px;">${currentPage}</span>
+            <button class="btn-page" ${currentPage >= totalPages ? "disabled" : ""} 
+                onclick="changeBookingPage(${currentPage + 1})"
+                style="padding:6px 12px; cursor:pointer; border-radius:6px; border:1px solid #ccc;">
+                Вперед &raquo;
+            </button>
+        </div>
+    `;
 }
 
 function renderBookings(list) {
     const container = document.getElementById("bookingsList");
+    if (!container) return;
     container.innerHTML = "";
 
-    if (list.length === 0) {
+    if (!list || list.length === 0) {
         container.innerHTML = "<p style='color:#636e72;'>Бронювань немає</p>";
         return;
     }
@@ -439,7 +497,7 @@ function closeBookingDetailModal() {
 }
 
 async function updateBookingStatus(id, status) {
-    const res = await fetch(`https://localhost:7227/api/bookings/${id}/status`, {
+    const res = await fetch(`http://localhost:5265/api/bookings/${id}/status`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -454,7 +512,7 @@ async function updateBookingStatus(id, status) {
         return;
     }
 
-    loadBookings(currentStatusFilter);
+    loadBookings(currentBookingPage, currentStatusFilter);
 }
 
 init();

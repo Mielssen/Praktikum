@@ -131,12 +131,17 @@ namespace Praktikum542.Controllers
         /// <response code="403">Недостатньо прав (потрібна роль 'manager').</response>
         [Authorize(Roles = "manager")]
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public IActionResult GetAll([FromQuery] string? status)
+        public IActionResult GetAll(
+            [FromQuery] string? status,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
-            return Ok(_service.GetAll(status));
+            var allBookings = _service.GetAll(status);
+            var result = allBookings.ApplyPagination(page, pageSize);
+
+            return Ok(result);
         }
 
         /// <summary>
