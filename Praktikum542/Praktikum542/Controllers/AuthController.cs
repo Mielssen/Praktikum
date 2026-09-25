@@ -79,5 +79,19 @@ namespace Praktikum542.Controllers
 
             return Ok("Профіль оновлено");
         }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
+        {
+            await _authService.ForgotPassword(dto);
+            return Ok("Якщо email існує, на нього надіслано лист з інструкціями");
+        }
+
+        [HttpPost("reset-password")]
+        public IActionResult ResetPassword(ResetPasswordDto dto)
+        {
+            _authService.ResetPassword(dto);
+            return Ok("Пароль успішно змінено");
+        }
     }
 }

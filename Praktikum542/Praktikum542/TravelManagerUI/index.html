@@ -22,6 +22,8 @@
             <label>Password</label>
         </div>
 
+        <p class="forgot-link" onclick="openForgotModal()">Забули пароль?</p>
+
         <div class="error" id="loginError"></div>
 
         <button onclick="login()">Sign in</button>
@@ -52,6 +54,35 @@
         </p>
     </div>
 
+</div>
+
+<div id="forgotModal" class="modal hidden">
+    <div class="forgot-modal-content">
+
+        <div id="forgotFormState">
+            <h3>Відновлення паролю</h3>
+            <p class="forgot-sub">Введіть email, вказаний при реєстрації — надішлемо посилання для скидання паролю</p>
+
+            <label class="forgot-field-label" for="forgotEmail">Email</label>
+            <input id="forgotEmail" class="forgot-input" placeholder="you@example.com">
+
+            <div class="error" id="forgotError"></div>
+
+            <div class="forgot-actions">
+                <button id="forgotSubmitBtn" onclick="submitForgotPassword()">Надіслати</button>
+                <button class="btn-secondary" onclick="closeForgotModal()">Скасувати</button>
+            </div>
+        </div>
+
+        <div id="forgotSuccessState" class="hidden">
+            <h3>Перевірте пошту</h3>
+            <p class="forgot-sub">Якщо такий email зареєстрований, на нього надіслано лист з посиланням для скидання паролю. Посилання дійсне 30 хвилин.</p>
+            <div class="forgot-actions">
+                <button onclick="closeForgotModal()">Зрозуміло</button>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 <script src="index.js"></script>
