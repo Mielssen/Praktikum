@@ -12,6 +12,8 @@ let sliderItems = [];
 let savedPersons = [];
 let currentPersonIndex = null;
 let favoriteTourIds = new Set();
+let currentPage = 1;
+const pageSize = 6;
 
 if (!token) {
     window.location.href = "index.html";
@@ -30,10 +32,63 @@ async function loadTourTypes() {
     });
 }
 
-async function loadTours() {
-    const res = await fetch(API_TOURS);
+async function loadTours(page = 1) {
+    currentPage = page;
+    const query = buildFilterParams(page);
+    const res = await fetch(`${API_TOURS}?${query}`);
     const data = await res.json();
-    renderTours(data);
+    renderTours(data.items || []);
+    renderPagination(data);
+}
+
+function renderPagination(data) {
+    const container = document.getElementById("paginationContainer");
+    if (!container) return;
+    container.innerHTML = "";
+
+    if (!data || data.totalPages <= 1) return;
+
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "btn-cancel";
+    prevBtn.style.padding = "8px 16px";
+    prevBtn.style.borderRadius = "10px";
+    prevBtn.innerText = "← Назад";
+    prevBtn.disabled = !data.hasPreviousPage;
+    if (data.hasPreviousPage) {
+        prevBtn.onclick = () => loadTours(data.page - 1);
+    }
+    container.appendChild(prevBtn);
+
+    for (let i = 1; i <= data.totalPages; i++) {
+        const pageBtn = document.createElement("button");
+        pageBtn.style.padding = "8px 14px";
+        pageBtn.style.borderRadius = "10px";
+        pageBtn.style.border = "none";
+        pageBtn.style.cursor = "pointer";
+        pageBtn.style.fontWeight = "bold";
+        pageBtn.innerText = i;
+
+        if (i === data.page) {
+            pageBtn.style.background = "#00b894";
+            pageBtn.style.color = "white";
+        } else {
+            pageBtn.style.background = "#fff";
+            pageBtn.style.color = "#2d3436";
+            pageBtn.onclick = () => loadTours(i);
+        }
+        container.appendChild(pageBtn);
+    }
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "btn-cancel";
+    nextBtn.style.padding = "8px 16px";
+    nextBtn.style.borderRadius = "10px";
+    nextBtn.innerText = "Вперед →";
+    nextBtn.disabled = !data.hasNextPage;
+    if (data.hasNextPage) {
+        nextBtn.onclick = () => loadTours(data.page + 1);
+    }
+    container.appendChild(nextBtn);
 }
 
 async function loadSavedPersons() {
@@ -566,7 +621,7 @@ async function cancelBooking(id) {
     loadBookings();
 }
 
-function buildFilterParams() {
+function buildFilterParams(page = 1) {
     const params = new URLSearchParams();
 
     const search = document.getElementById("search").value.trim();
@@ -583,14 +638,14 @@ function buildFilterParams() {
     if (minDays) params.append("minDays", minDays);
     if (maxDays) params.append("maxDays", maxDays);
 
+    params.append("page", page);
+    params.append("pageSize", pageSize);
+
     return params.toString();
 }
 
 async function applyFilters() {
-    const query = buildFilterParams();
-    const res = await fetch(`${API_TOURS}?${query}`);
-    const data = await res.json();
-    renderTours(data);
+    await loadTours(1);
 
     const search = document.getElementById("search").value.trim();
     if (search) {
@@ -609,7 +664,7 @@ function resetFilters() {
     document.getElementById("filterMinDays").value = "";
     document.getElementById("filterMaxDays").value = "";
     document.getElementById("searchChip").classList.add("hidden");
-    loadTours();
+    loadTours(1);
 }
 
 function searchTours() {
@@ -629,7 +684,7 @@ function logout() {
 async function init() {
     await loadTourTypes();
     await loadFavorites();
-    await loadTours();
+    await loadTours(1);
     await loadBookings();
 }
 
