@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Praktikum542.DTOs;
@@ -67,13 +67,13 @@ namespace Praktikum542.Controllers
         /// <remarks>
         /// Потребує роль 'manager'.
         ///
-        /// Дозволені статуси: Pending, Confirmed, Cancelled.
+       /// Дозволені статуси: pending, confirmed, cancelled.
         ///
         /// Приклад запиту:
         ///
         ///     PUT /api/bookings/5/status
         ///     {
-        ///        "status": "Confirmed"
+        ///        "status": "confirmed"
         ///     }
         ///
         /// Приклад успішної відповіді (200):
@@ -106,7 +106,7 @@ namespace Praktikum542.Controllers
         ///
         /// Приклад запиту:
         ///
-        ///     GET /api/bookings?status=Confirmed
+      ///     GET /api/bookings?status=confirmed
         ///
         /// Приклад успішної відповіді (200):
         ///
@@ -118,7 +118,7 @@ namespace Praktikum542.Controllers
         ///           "startDate": "2026-07-20",
         ///           "personsCount": 2,
         ///           "totalPrice": 7000.00,
-        ///           "status": "Confirmed",
+        ///           "status": "confirmed",
         ///           "bookingDate": "2026-06-01T10:00:00Z",
         ///           "userEmail": "client@example.com",
         ///           "userName": "Іван Петренко"
@@ -160,7 +160,7 @@ namespace Praktikum542.Controllers
         ///           "startDate": "2026-08-01",
         ///           "personsCount": 1,
         ///           "totalPrice": 5200.00,
-        ///           "status": "Pending",
+        ///           "status": "pending",
         ///           "bookingDate": "2026-06-10T14:30:00Z"
         ///        }
         ///     ]
@@ -180,25 +180,54 @@ namespace Praktikum542.Controllers
         }
 
         /// <summary>
-        /// Скасовує бронювання поточним авторизованим користувачем.
+        /// Скасовує бронювання поточного авторизованого користувача
+        /// та за потреби нараховує штраф.
         /// </summary>
         /// <remarks>
         /// Користувач може скасувати лише власне бронювання.
         ///
+        /// Якщо до початку туру залишилося менше 3 днів,
+        /// система нараховує штраф у розмірі 30% від загальної суми бронювання.
+        ///
+        /// Бронювання не видаляється з бази даних,
+        /// а його статус змінюється на "cancelled".
+        ///
         /// Приклад запиту:
         ///
-        ///     DELETE /api/bookings/10
+        ///     DELETE /api/bookings/28
         ///
-        /// Приклад успішної відповіді (200):
+        /// Приклад успішної відповіді зі штрафом:
         ///
-        ///     "Бронювання скасовано"
+        ///     {
+        ///        "message": "Бронювання скасовано",
+        ///        "penaltyApplied": true,
+        ///        "penaltyAmount": 1260
+        ///     }
+        ///
+        /// Приклад успішної відповіді без штрафу:
+        ///
+        ///     {
+        ///        "message": "Бронювання скасовано",
+        ///        "penaltyApplied": false,
+        ///        "penaltyAmount": 0
+        ///     }
         /// </remarks>
-        /// <param name="id">Ідентифікатор бронювання для скасування.</param>
-        /// <response code="200">Бронювання успішно скасовано.</response>
-        /// <response code="400">Бронювання не знайдено або воно не належить поточному користувачу.</response>
-        /// <response code="401">Користувач не авторизований.</response>
+        /// <param name="id">
+        /// Ідентифікатор бронювання, яке необхідно скасувати.
+        /// </param>
+        /// <response code="200">
+        /// Бронювання успішно скасовано.
+        /// У відповіді вказується, чи був нарахований штраф, та його сума.
+        /// </response>
+        /// <response code="400">
+        /// Бронювання не знайдено, вже скасовано,
+        /// не належить користувачу або дата початку туру вже минула.
+        /// </response>
+        /// <response code="401">
+        /// Користувач не авторизований або JWT-токен недійсний.
+        /// </response>
         [HttpDelete("{id}")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Cancel(int id)
@@ -207,8 +236,14 @@ namespace Praktikum542.Controllers
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value
             );
 
-            _service.Cancel(credentialId, id);
-            return Ok("Бронювання скасовано");
+            var penaltyAmount = _service.Cancel(credentialId, id);
+
+            return Ok(new
+            {
+                message = "Бронювання скасовано",
+                penaltyApplied = penaltyAmount > 0,
+                penaltyAmount
+            });
         }
     }
 }
