@@ -144,7 +144,60 @@ namespace Praktikum542.Controllers
             var token = _authService.Login(dto);
             return Ok(token);
         }
+        /// <summary>
+        /// Змінює пароль поточного авторизованого користувача.
+        /// Перед зміною перевіряє правильність старого пароля.
+        /// </summary>
+        /// <remarks>
+        /// Потребує заголовок Authorization: Bearer {token}.
+        ///
+        /// Приклад запиту:
+        ///
+        ///     PUT /api/auth/change-password
+        ///     {
+        ///        "oldPassword": "OldPassword123",
+        ///        "newPassword": "NewPassword123",
+        ///        "confirmPassword": "NewPassword123"
+        ///     }
+        ///
+        /// Приклад успішної відповіді (200):
+        ///
+        ///     {
+        ///        "message": "Пароль успішно змінено"
+        ///     }
+        ///
+        /// Новий пароль не може співпадати зі старим.
+        /// Новий пароль та його підтвердження повинні співпадати.
+        /// </remarks>
+        /// <param name="dto">
+        /// Старий пароль, новий пароль та підтвердження нового пароля
+        /// </param>
+        /// <response code="200">Пароль успішно змінено</response>
+        /// <response code="400">
+        /// Помилка зміни пароля. Можливі коди:
+        /// INVALID_PASSWORD, PASSWORD_MISMATCH, WRONG_PASSWORD, SAME_PASSWORD
+        /// </response>
+        /// <response code="401">Відсутній або недійсний JWT-токен</response>
+        /// <response code="404">Користувача не знайдено</response>
+        [Authorize]
+        [HttpPut("change-password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult ChangePassword([FromBody] ChangePasswordDto dto)
+        {
+            var credentialId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+            );
 
+            _authService.ChangePassword(credentialId, dto);
+
+            return Ok(new
+            {
+                message = "Пароль успішно змінено"
+            });
+        }
         /// <summary>
         /// Повертає профіль поточного автентифікованого користувача.
         /// </summary>
