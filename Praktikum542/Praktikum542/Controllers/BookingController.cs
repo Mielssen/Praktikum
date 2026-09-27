@@ -67,13 +67,13 @@ namespace Praktikum542.Controllers
         /// <remarks>
         /// Потребує роль 'manager'.
         ///
-        /// Дозволені статуси: Pending, Confirmed, Cancelled.
+       /// Дозволені статуси: pending, confirmed, cancelled.
         ///
         /// Приклад запиту:
         ///
         ///     PUT /api/bookings/5/status
         ///     {
-        ///        "status": "Confirmed"
+        ///        "status": "confirmed"
         ///     }
         ///
         /// Приклад успішної відповіді (200):
@@ -106,7 +106,7 @@ namespace Praktikum542.Controllers
         ///
         /// Приклад запиту:
         ///
-        ///     GET /api/bookings?status=Confirmed
+      ///     GET /api/bookings?status=confirmed
         ///
         /// Приклад успішної відповіді (200):
         ///
@@ -118,7 +118,7 @@ namespace Praktikum542.Controllers
         ///           "startDate": "2026-07-20",
         ///           "personsCount": 2,
         ///           "totalPrice": 7000.00,
-        ///           "status": "Confirmed",
+        ///           "status": "confirmed",
         ///           "bookingDate": "2026-06-01T10:00:00Z",
         ///           "userEmail": "client@example.com",
         ///           "userName": "Іван Петренко"
@@ -160,7 +160,7 @@ namespace Praktikum542.Controllers
         ///           "startDate": "2026-08-01",
         ///           "personsCount": 1,
         ///           "totalPrice": 5200.00,
-        ///           "status": "Pending",
+        ///           "status": "pending",
         ///           "bookingDate": "2026-06-10T14:30:00Z"
         ///        }
         ///     ]
