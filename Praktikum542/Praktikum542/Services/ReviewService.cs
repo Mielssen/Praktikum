@@ -39,9 +39,17 @@ namespace Praktikum542.Services
                     "FORBIDDEN",
                     "Це не ваше бронювання"
                 );
+            
+            if (booking.Status == "cancelled")
+    throw new AppException(
+        "BOOKING_CANCELLED",
+        "Неможливо залишити відгук для скасованого бронювання"
+    
+                );
 
             var tourEndDate =
                 booking.StartDate.AddDays(booking.Tour.DurationDays);
+            
 
             var today = DateOnly.FromDateTime(DateTime.Now);
 
