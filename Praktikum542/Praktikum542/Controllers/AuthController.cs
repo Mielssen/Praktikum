@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Praktikum542.DTOs;
@@ -18,28 +18,36 @@ namespace Praktikum542.Controllers
     {
         private readonly CredentialsRepository _repo;
         private readonly AuthentificationService _authService;
+        private readonly IWebHostEnvironment _environment;
 
-        public AuthController(CredentialsRepository repo, AuthentificationService authService)
+        public AuthController(
+       CredentialsRepository repo,
+       AuthentificationService authService,
+       IWebHostEnvironment environment)
         {
             _repo = repo;
             _authService = authService;
+            _environment = environment;
         }
 
         /// <summary>
-        /// Реєструє нового користувача (роль "client") та одразу видає JWT-токен.
+        /// Реєструє нового користувача (роль "client"), дозволяє додати аватар
+        /// та одразу видає JWT-токен.
         /// </summary>
         /// <remarks>
-        /// Приклад запиту:
+        /// Дані передаються у форматі multipart/form-data.
         ///
-        ///     POST /api/auth/register
-        ///     {
-        ///        "email": "olena@gmail.com",
-        ///        "password": "MySecurePass1",
-        ///        "name": "Олена Коваленко",
-        ///        "phone": "0501234567",
-        ///        "passportData": "123456789",
-        ///        "dateOfBirth": "1995-03-15"
-        ///     }
+        /// Поля:
+        /// - Email — email користувача
+        /// - Password — пароль
+        /// - Name — ім'я
+        /// - Phone — номер телефону без +38
+        /// - PassportData — паспортні дані
+        /// - DateOfBirth — дата народження
+        /// - Avatar — необов'язкове фото профілю
+        ///
+        /// Для аватара дозволені формати JPG, JPEG та PNG.
+        /// Максимальний розмір аватара — 5 МБ.
         ///
         /// Приклад успішної відповіді (200):
         ///
@@ -51,19 +59,53 @@ namespace Praktikum542.Controllers
         /// - Email має бути унікальним і валідного формату
         /// - Телефон — рівно 10 цифр (без коду країни, +38 додається автоматично)
         /// - Користувач має бути повнолітнім (18+)
+        /// - Аватар необов'язковий
         /// </remarks>
-        /// <param name="dto">Дані для реєстрації: email, пароль, ім'я, телефон, паспортні дані, дата народження</param>
-        /// <response code="200">Реєстрація успішна, повертає JWT-токен</response>
+        /// <param name="dto">
+        /// Дані для реєстрації та необов'язковий файл аватара
+        /// </param>
+        /// <response code="200">
+        /// Реєстрація успішна, повертає JWT-токен
+        /// </response>
         /// <response code="400">
-        /// Помилка валідації. Можливі коди в тілі відповіді:
-        /// INVALID_EMAIL, INVALID_PASSWORD, INVALID_PHONE, UNDERAGE, EMAIL_EXISTS, DB_ERROR
+        /// Помилка валідації даних або аватара
         /// </response>
         [HttpPost("register")]
         [ProducesResponseType(typeof(TokenResponceDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Register(RegisterRequestDto dto)
+        public async Task<IActionResult> Register([FromForm] RegisterRequestDto dto)
         {
+            if (dto.Avatar != null && dto.Avatar.Length > 0)
+            {
+                var validationError = ValidateAvatar(dto.Avatar);
+
+                if (validationError != null)
+                    return BadRequest(validationError);
+            }
+
             var result = await _authService.RegisterUser(dto);
+
+            if (dto.Avatar != null && dto.Avatar.Length > 0)
+            {
+                var email = dto.Email.Trim().ToLower();
+
+                var credential = _repo.GetByEmail(email);
+
+                if (credential == null)
+                    return NotFound("Користувача не знайдено");
+
+                var detail = _repo.GetUserDetail(credential.CredentialId);
+
+                if (detail == null)
+                    return NotFound("Дані користувача не знайдено");
+
+                var avatarUrl = await SaveAvatarAsync(dto.Avatar);
+
+                detail.AvatarUrl = avatarUrl;
+
+                _repo.UpdateUserDetail(detail);
+            }
+
             return Ok(result);
         }
 
@@ -116,7 +158,8 @@ namespace Praktikum542.Controllers
         ///        "name": "Олена Коваленко",
         ///        "phone": "+380501234567",
         ///        "passportData": "123456789",
-        ///        "dateOfBirth": "1995-03-15"
+        ///        "dateOfBirth": "1995-03-15",
+        ///        "avatarUrl": "/avatars/550e8400-e29b-41d4-a716-446655440000.jpg"
         ///     }
         /// </remarks>
         /// <response code="200">Профіль знайдено і повернено</response>
@@ -145,7 +188,8 @@ namespace Praktikum542.Controllers
                 Name = detail.Name,
                 Phone = detail.Phone,
                 PassportData = detail.PassportData,
-                DateOfBirth = detail.DateOfBirth
+                DateOfBirth = detail.DateOfBirth,
+                AvatarUrl = detail.AvatarUrl
             });
         }
 
@@ -195,6 +239,72 @@ namespace Praktikum542.Controllers
             _repo.UpdateUserDetail(detail);
 
             return Ok("Профіль оновлено");
+        }
+        /// <summary>
+        /// Завантажує або замінює аватар поточного користувача.
+        /// </summary>
+        /// <remarks>
+        /// Потребує заголовок Authorization: Bearer {token}.
+        ///
+        /// Файл передається у форматі multipart/form-data.
+        ///
+        /// Дозволені формати:
+        /// - JPG
+        /// - JPEG
+        /// - PNG
+        ///
+        /// Максимальний розмір файлу — 5 МБ.
+        ///
+        /// Приклад успішної відповіді (200):
+        ///
+        ///     {
+        ///        "message": "Аватар успішно завантажено",
+        ///        "avatarUrl": "/avatars/550e8400-e29b-41d4-a716-446655440000.jpg"
+        ///     }
+        ///
+        /// Якщо у користувача вже був аватар, старий файл буде видалено.
+        /// </remarks>
+        /// <param name="file">Файл зображення аватара</param>
+        /// <response code="200">Аватар успішно завантажено або замінено</response>
+        /// <response code="400">Файл відсутній, має неправильний формат або перевищує 5 МБ</response>
+        /// <response code="401">Відсутній або недійсний JWT-токен</response>
+        /// <response code="404">Дані користувача не знайдено</response>
+        [Authorize]
+        [HttpPost("profile/avatar")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UploadAvatar(IFormFile file)
+        {
+            var validationError = ValidateAvatar(file);
+
+            if (validationError != null)
+                return BadRequest(validationError);
+
+            var credentialId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+            );
+
+            var detail = _repo.GetUserDetail(credentialId);
+
+            if (detail == null)
+                return NotFound("Користувача не знайдено");
+
+            var avatarUrl = await SaveAvatarAsync(
+                file,
+                detail.AvatarUrl
+            );
+
+            detail.AvatarUrl = avatarUrl;
+
+            _repo.UpdateUserDetail(detail);
+
+            return Ok(new
+            {
+                message = "Аватар успішно завантажено",
+                avatarUrl = avatarUrl
+            });
         }
 
         /// <summary>
@@ -265,6 +375,79 @@ namespace Praktikum542.Controllers
         {
             _authService.ResetPassword(dto);
             return Ok("Пароль успішно змінено");
+        }
+        private string? ValidateAvatar(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return "Файл не вибрано";
+
+            var allowedExtensions = new[]
+            {
+        ".jpg",
+        ".jpeg",
+        ".png"
+    };
+
+            var extension = Path.GetExtension(file.FileName)
+                .ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+                return "Дозволені тільки JPG, JPEG та PNG файли";
+
+            const long maxFileSize = 5 * 1024 * 1024;
+
+            if (file.Length > maxFileSize)
+                return "Максимальний розмір файлу — 5 МБ";
+
+            return null;
+        }
+        private async Task<string> SaveAvatarAsync(
+    IFormFile file,
+    string? oldAvatarUrl = null)
+        {
+            var extension = Path.GetExtension(file.FileName)
+                .ToLowerInvariant();
+
+            var avatarsFolder = Path.Combine(
+                _environment.WebRootPath,
+                "avatars"
+            );
+
+            if (!Directory.Exists(avatarsFolder))
+            {
+                Directory.CreateDirectory(avatarsFolder);
+            }
+
+            if (!string.IsNullOrWhiteSpace(oldAvatarUrl))
+            {
+                var oldAvatarPath = Path.Combine(
+                    _environment.WebRootPath,
+                    oldAvatarUrl
+                        .TrimStart('/')
+                        .Replace('/', Path.DirectorySeparatorChar)
+                );
+
+                if (System.IO.File.Exists(oldAvatarPath))
+                {
+                    System.IO.File.Delete(oldAvatarPath);
+                }
+            }
+
+            var fileName = $"{Guid.NewGuid()}{extension}";
+
+            var filePath = Path.Combine(
+                avatarsFolder,
+                fileName
+            );
+
+            using (var stream = new FileStream(
+                filePath,
+                FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return $"/avatars/{fileName}";
         }
     }
 }
