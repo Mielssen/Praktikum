@@ -106,6 +106,8 @@ try
     builder.Services.AddScoped<FavoriteService>();
     builder.Services.AddScoped<BookingRepository>();
     builder.Services.AddScoped<BookingService>();
+    builder.Services.AddScoped<ReviewRepository>();
+    builder.Services.AddScoped<ReviewService>();
     builder.Services.AddScoped<CredentialsRepository>();
     builder.Services.AddScoped<AuthentificationService>();
     builder.Services.AddScoped<TourRepository>();
