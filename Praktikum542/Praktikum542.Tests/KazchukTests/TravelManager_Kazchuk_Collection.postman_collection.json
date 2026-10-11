@@ -1,0 +1,152 @@
+﻿{
+  "info": {
+    "name": "TravelManager_Kazchuk_API_Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. GET Swagger Spec (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Статус відповіді 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7227/swagger/v1/swagger.json",
+          "protocol": "https",
+          "host": [ "localhost" ],
+          "port": "7227",
+          "path": [ "swagger", "v1", "swagger.json" ]
+        }
+      }
+    },
+    {
+      "name": "2. POST Auth Login - Empty Body (400 Bad Request)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Статус відповіді 400 Bad Request\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"\",\"password\":\"\"}"
+        },
+        "url": {
+          "raw": "https://localhost:7227/api/auth/login",
+          "protocol": "https",
+          "host": [ "localhost" ],
+          "port": "7227",
+          "path": [ "api", "auth", "login" ]
+        }
+      }
+    },
+    {
+      "name": "3. GET Admin Users without Token (401 Unauthorized)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Статус 401 Unauthorized\", function () {",
+              "    pm.response.to.have.status(401);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7227/api/admin/users",
+          "protocol": "https",
+          "host": [ "localhost" ],
+          "port": "7227",
+          "path": [ "api", "admin", "users" ]
+        }
+      }
+    },
+    {
+      "name": "4. GET My Bookings without Token (401 Unauthorized)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Статус 401 Unauthorized\", function () {",
+              "    pm.response.to.have.status(401);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7227/api/bookings/my",
+          "protocol": "https",
+          "host": [ "localhost" ],
+          "port": "7227",
+          "path": [ "api", "bookings", "my" ]
+        }
+      }
+    },
+    {
+      "name": "5. GET Non-existent Endpoint (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Статус 404 Not Found\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7227/api/unknown-endpoint-404",
+          "protocol": "https",
+          "host": [ "localhost" ],
+          "port": "7227",
+          "path": [ "api", "unknown-endpoint-404" ]
+        }
+      }
+    }
+  ]
+}
