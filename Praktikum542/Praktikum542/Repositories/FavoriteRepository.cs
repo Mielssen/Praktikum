@@ -12,7 +12,7 @@ namespace Praktikum542.Repositories
             _context = context;
         }
 
-        public List<Favorite> GetByCredentialId(int credentialId)
+        public virtual List<Favorite> GetByCredentialId(int credentialId)
         {
             return _context.Favorites
                 .Include(f => f.Tour)
@@ -20,24 +20,24 @@ namespace Praktikum542.Repositories
                 .ToList();
         }
 
-        public Favorite? GetByCredentialAndTour(int credentialId, int tourId)
+        public virtual Favorite? GetByCredentialAndTour(int credentialId, int tourId)
         {
             return _context.Favorites
                 .FirstOrDefault(f => f.CredentialId == credentialId && f.TourId == tourId);
         }
 
-        public bool TourExists(int tourId)
+        public virtual bool TourExists(int tourId)
         {
             return _context.Tours.Any(t => t.TourId == tourId);
         }
 
-        public void Add(Favorite favorite)
+        public virtual void Add(Favorite favorite)
         {
             _context.Favorites.Add(favorite);
             _context.SaveChanges();
         }
 
-        public void Delete(Favorite favorite)
+        public virtual void Delete(Favorite favorite)
         {
             _context.Favorites.Remove(favorite);
             _context.SaveChanges();
