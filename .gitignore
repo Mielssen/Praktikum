@@ -9,7 +9,17 @@
 *.user
 *.userosscache
 *.sln.docstates
+<<<<<<< HEAD
 *.env
+=======
+
+# Environment and secrets (Security)
+.env
+*.env
+!.env.example
+appsettings.Production.json
+appsettings.*.local.json
+>>>>>>> cd87778 (feat(module-3): implement reliability, admin refactoring, db optimization and env security)
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -82,6 +92,15 @@ dlldata.c
 # Benchmark Results
 BenchmarkDotNet.Artifacts/
 
+<<<<<<< HEAD
+=======
+# Profiling and Tracing (dotnet-trace, Speedscope)
+*.nettrace
+*.speedscope.json
+*.dmp
+*.etl
+
+>>>>>>> cd87778 (feat(module-3): implement reliability, admin refactoring, db optimization and env security)
 # .NET Core
 project.lock.json
 project.fragment.lock.json
@@ -171,10 +190,21 @@ _TeamCity*
 .axoCover/*
 !.axoCover/settings.json
 
+<<<<<<< HEAD
 # Coverlet is a free, cross platform Code Coverage Tool
 coverage*.json
 coverage*.xml
 coverage*.info
+=======
+# Coverlet & ReportGenerator Code Coverage Tools
+coverage*.json
+coverage*.xml
+coverage*.info
+*.cobertura.xml
+CoverageReport/
+**/CoverageReport/
+**/TestResults/
+>>>>>>> cd87778 (feat(module-3): implement reliability, admin refactoring, db optimization and env security)
 
 # Visual Studio code coverage results
 *.coverage
@@ -428,4 +458,8 @@ FodyWeavers.xsd
 *.msm
 *.msp
 *.mp4
+<<<<<<< HEAD
 /Praktikum542/Praktikum542.Tests/ToderikoTests/CoverReport
+=======
+/Praktikum542/Praktikum542.Tests/ToderikoTests/CoverReport
+>>>>>>> cd87778 (feat(module-3): implement reliability, admin refactoring, db optimization and env security)
