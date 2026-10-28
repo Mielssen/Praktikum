@@ -1,4 +1,5 @@
-﻿using Praktikum542.DTOs;
+using Praktikum542.Common;
+using Praktikum542.DTOs;
 using Praktikum542.Exceptions;
 using Praktikum542.Repositories;
 
@@ -122,9 +123,9 @@ namespace Praktikum542.Services
 
             return new StatisticsDto
             {
-                TotalClients = _repo.CountByRole("client"),
-                TotalManagers = _repo.CountByRole("manager"),
-                TotalUsers = _repo.CountByRole("client") + _repo.CountByRole("manager"),
+                TotalClients = _repo.CountByRole(UserRoles.Client),
+                TotalManagers = _repo.CountByRole(UserRoles.Manager),
+                TotalUsers = _repo.CountByRole(UserRoles.Client) + _repo.CountByRole(UserRoles.Manager),
                 TotalBookings = _repo.CountAllBookings(),
                 PendingBookings = _repo.CountBookingsByStatus("pending"),
                 ConfirmedBookings = _repo.CountBookingsByStatus("confirmed"),

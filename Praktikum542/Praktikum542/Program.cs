@@ -84,9 +84,19 @@ try
 
     builder.Services.AddDbContext<PraktikumContext>(options =>
     {
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
         options.UseMySql(
-            builder.Configuration.GetConnectionString("DefaultConnection"),
-            new MySqlServerVersion(new Version(8, 0, 0))
+            connectionString,
+            new MySqlServerVersion(new Version(8, 0, 0)),
+            mySqlOptions =>
+            {
+                mySqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(5),
+                    errorNumbersToAdd: null);
+
+                mySqlOptions.CommandTimeout(30);
+            }
         );
     });
 
@@ -211,6 +221,7 @@ finally
 {
     Log.CloseAndFlush();
 }
+
 public partial class Program
 {
 }
