@@ -1,14 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Praktikum542.Constants;
 using Praktikum542.DTOs;
+using Praktikum542.Exceptions;
 using Praktikum542.Services;
+using System;
 using System.Security.Claims;
 
 namespace Praktikum542.Controllers
 {
     /// <summary>
-    /// Керування відгуками та рейтингами турів.
+    /// Керування відгуками та рейтингами турів (v1).
     /// </summary>
     [Route("api/reviews")]
     [ApiController]
@@ -22,39 +25,21 @@ namespace Praktikum542.Controllers
         }
 
         /// <summary>
-        /// Створює відгук для завершеного туру.
+        /// Приватний хелпер для отримання ID користувача без int.Parse у кожному методі.
         /// </summary>
-        /// <remarks>
-        /// Відгук може залишити лише авторизований користувач
-        /// для власного завершеного бронювання.
-        ///
-        /// Оцінка повинна бути від 1 до 5.
-        ///
-        /// Для одного бронювання можна залишити лише один відгук.
-        ///
-        /// Приклад запиту:
-        ///
-        ///     POST /api/reviews
-        ///     {
-        ///        "bookingId": 1,
-        ///        "rating": 5,
-        ///        "comment": "Чудова подорож!"
-        ///     }
-        ///
-        /// Приклад успішної відповіді:
-        ///
-        ///     "Відгук успішно додано"
-        /// </remarks>
-        /// <param name="dto">
-        /// Дані відгуку: ідентифікатор бронювання,
-        /// оцінка від 1 до 5 та текст коментаря.
-        /// </param>
-        /// <response code="200">Відгук успішно створено.</response>
-        /// <response code="400">
-        /// Некоректна оцінка, тур ще не завершився,
-        /// бронювання не знайдено або відгук уже існує.
-        /// </response>
-        /// <response code="401">Користувач не авторизований.</response>
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                              ?? User.FindFirst("sub")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            {
+                throw new UnauthorizedAccessException("Користувач не авторизований.");
+            }
+
+            return userId;
+        }
+
         [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
@@ -62,20 +47,22 @@ namespace Praktikum542.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Create([FromBody] CreateReviewDto dto)
         {
-            var credentialId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
-
-            _service.Create(credentialId, dto);
-
-            return Ok("Відгук успішно додано");
+            try
+            {
+                var credentialId = GetCurrentUserId();
+                _service.Create(credentialId, dto);
+                return Ok("Відгук успішно додано");
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { Code = ex.Code, Message = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
         }
 
-        /// <summary>
-        /// Отримує всі відгуки для конкретного туру.
-        /// </summary>
-        /// <param name="tourId">Ідентифікатор туру.</param>
-        /// <response code="200">Список відгуків для туру.</response>
         [HttpGet("tour/{tourId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetByTour(int tourId)
@@ -83,11 +70,6 @@ namespace Praktikum542.Controllers
             return Ok(_service.GetByTourId(tourId));
         }
 
-        /// <summary>
-        /// Отримує середній рейтинг конкретного туру.
-        /// </summary>
-        /// <param name="tourId">Ідентифікатор туру.</param>
-        /// <response code="200">Середній рейтинг туру.</response>
         [HttpGet("tour/{tourId}/average")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAverageRating(int tourId)
@@ -99,6 +81,29 @@ namespace Praktikum542.Controllers
                 tourId,
                 averageRating
             });
+        }
+
+        [Authorize]
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                int currentUserId = GetCurrentUserId();
+                bool isDeleted = _service.DeleteReview(id, currentUserId, User.IsInRole(ReviewConstants.AdminRole));
+                
+                if (!isDeleted)
+                    return NotFound(ReviewConstants.ReviewNotFound);
+
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
         }
     }
 }

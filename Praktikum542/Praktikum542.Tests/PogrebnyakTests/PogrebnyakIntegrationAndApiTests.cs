@@ -89,6 +89,14 @@ namespace Praktikum542.Tests.PogrebnyakTests
             Assert.Equal(HttpStatusCode.Unauthorized, result.StatusCode);
         }
 
+        [Fact]
+        public void GetReview_V1_Endpoint_RemainsCompatible()
+        {
+            // Перевірка сумісності v1 контракту відгуків
+            var result = MockApiGet("/api/reviews/tour/1/average");
+            Xunit.Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
+        }
+
         // Вспомогательные методы эмуляции REST API
         private (HttpStatusCode StatusCode, string ContentType, object? Data) MockApiGet(string path, bool isAuthenticated = true)
         {
