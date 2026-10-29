@@ -131,6 +131,8 @@ try
 
     var jwtSettings = builder.Configuration.GetSection("Jwt");
 
+    builder.Services.AddMemoryCache();
+
     builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
