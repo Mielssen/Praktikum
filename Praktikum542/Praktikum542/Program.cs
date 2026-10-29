@@ -13,6 +13,7 @@ using Praktikum542.Repositories;
 using Praktikum542.Services;
 using Serilog;
 using System.Text;
+using System.Threading.RateLimiting;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -85,6 +86,7 @@ try
     builder.Services.AddDbContext<PraktikumContext>(options =>
     {
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
         options.UseMySql(
             connectionString,
             new MySqlServerVersion(new Version(8, 0, 0)),
@@ -149,6 +151,44 @@ try
         };
     });
 
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+        options.AddPolicy("auth-login", context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 5,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                }));
+
+        options.AddPolicy("auth-register", context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 3,
+                    Window = TimeSpan.FromMinutes(10),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                }));
+
+        options.AddPolicy("auth-forgot-password", context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 3,
+                    Window = TimeSpan.FromMinutes(10),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                }));
+    });
+
     var app = builder.Build();
 
     app.UseExceptionHandler(errorApp =>
@@ -198,6 +238,7 @@ try
 
     app.UseAuthentication();
     app.UseMiddleware<RequestLoggingMiddleware>();
+    app.UseRateLimiter();
     app.UseAuthorization();
 
     if (app.Environment.IsDevelopment())

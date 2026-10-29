@@ -5,6 +5,7 @@ using Praktikum542.DTOs;
 using Praktikum542.Models;
 using Praktikum542.Repositories;
 using Praktikum542.Services;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Praktikum542.Controllers
 {
@@ -71,6 +72,7 @@ namespace Praktikum542.Controllers
         /// Помилка валідації даних або аватара
         /// </response>
         [HttpPost("register")]
+        [EnableRateLimiting("auth-register")]
         [ProducesResponseType(typeof(TokenResponceDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Register([FromForm] RegisterRequestDto dto)
@@ -137,6 +139,7 @@ namespace Praktikum542.Controllers
         /// ACCOUNT_DISABLED (акаунт деактивований), WRONG_PASSWORD
         /// </response>
         [HttpPost("login")]
+        [EnableRateLimiting("auth-login")]
         [ProducesResponseType(typeof(TokenResponceDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         public IActionResult Login(LoginDto dto)
@@ -388,6 +391,7 @@ namespace Praktikum542.Controllers
         /// </response>
         /// <response code="400">Некоректний формат email (код INVALID_EMAIL)</response>
         [HttpPost("forgot-password")]
+        [EnableRateLimiting("auth-forgot-password")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
