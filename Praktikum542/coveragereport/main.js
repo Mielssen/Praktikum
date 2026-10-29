@@ -296,31 +296,31 @@ var assemblies = [
       { "name": "AspNetCoreGeneratedDocument.Views_Shared__Layout", "rp": "Praktikum542_Views_Shared__Layout.html", "cl": 0, "ucl": 3, "cal": 3, "tl": 49, "cb": 0, "tb": 20, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "AspNetCoreGeneratedDocument.Views_Shared_Error", "rp": "Praktikum542_Views_Shared_Error.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 25, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Controllers.AdminController", "rp": "Praktikum542_AdminController.html", "cl": 0, "ucl": 27, "cal": 27, "tl": 66, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Controllers.AuthController", "rp": "Praktikum542_AuthController.html", "cl": 0, "ucl": 161, "cal": 161, "tl": 506, "cb": 0, "tb": 40, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Controllers.BookingController", "rp": "Praktikum542_BookingController.html", "cl": 0, "ucl": 38, "cal": 38, "tl": 249, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Controllers.FavoriteController", "rp": "Praktikum542_FavoriteController.html", "cl": 24, "ucl": 0, "cal": 24, "tl": 112, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Controllers.AuthController", "rp": "Praktikum542_AuthController.html", "cl": 44, "ucl": 117, "cal": 161, "tl": 506, "cb": 6, "tb": 40, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Controllers.BookingController", "rp": "Praktikum542_BookingController.html", "cl": 17, "ucl": 21, "cal": 38, "tl": 249, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Controllers.FavoriteController", "rp": "Praktikum542_FavoriteController.html", "cl": 0, "ucl": 24, "cal": 24, "tl": 112, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Controllers.HomeController", "rp": "Praktikum542_HomeController.html", "cl": 0, "ucl": 13, "cal": 13, "tl": 32, "cb": 0, "tb": 4, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Controllers.ReviewController", "rp": "Praktikum542_ReviewController.html", "cl": 0, "ucl": 22, "cal": 22, "tl": 104, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Controllers.SavedPersonController", "rp": "Praktikum542_SavedPersonController.html", "cl": 0, "ucl": 24, "cal": 24, "tl": 53, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Controllers.TourController", "rp": "Praktikum542_TourController.html", "cl": 0, "ucl": 52, "cal": 52, "tl": 117, "cb": 0, "tb": 12, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.DTOs.AddFavoriteDto", "rp": "Praktikum542_AddFavoriteDto.html", "cl": 1, "ucl": 0, "cal": 1, "tl": 7, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.DTOs.BookingDto", "rp": "Praktikum542_BookingDto.html", "cl": 0, "ucl": 17, "cal": 17, "tl": 25, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Controllers.TourController", "rp": "Praktikum542_TourController.html", "cl": 18, "ucl": 34, "cal": 52, "tl": 117, "cb": 0, "tb": 12, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.DTOs.AddFavoriteDto", "rp": "Praktikum542_AddFavoriteDto.html", "cl": 0, "ucl": 1, "cal": 1, "tl": 7, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.DTOs.BookingDto", "rp": "Praktikum542_BookingDto.html", "cl": 17, "ucl": 0, "cal": 17, "tl": 25, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.DTOs.BookingPersonDto", "rp": "Praktikum542_BookingPersonDto.html", "cl": 4, "ucl": 0, "cal": 4, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.DTOs.ChangePasswordDto", "rp": "Praktikum542_ChangePasswordDto.html", "cl": 0, "ucl": 3, "cal": 3, "tl": 9, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.DTOs.ChangePasswordDto", "rp": "Praktikum542_ChangePasswordDto.html", "cl": 3, "ucl": 0, "cal": 3, "tl": 9, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.DTOs.CreateBookingDto", "rp": "Praktikum542_CreateBookingDto.html", "cl": 6, "ucl": 0, "cal": 6, "tl": 27, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.DTOs.CreateReviewDto", "rp": "Praktikum542_CreateReviewDto.html", "cl": 0, "ucl": 3, "cal": 3, "tl": 11, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.DTOs.CreateTourDto", "rp": "Praktikum542_CreateTourDto.html", "cl": 0, "ucl": 8, "cal": 8, "tl": 31, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.DTOs.FavoriteDto", "rp": "Praktikum542_FavoriteDto.html", "cl": 7, "ucl": 0, "cal": 7, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.DTOs.ForgotPasswordDto", "rp": "Praktikum542_ForgotPasswordDto.html", "cl": 0, "ucl": 1, "cal": 1, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.DTOs.CreateReviewDto", "rp": "Praktikum542_CreateReviewDto.html", "cl": 3, "ucl": 0, "cal": 3, "tl": 11, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.DTOs.CreateTourDto", "rp": "Praktikum542_CreateTourDto.html", "cl": 8, "ucl": 0, "cal": 8, "tl": 31, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.DTOs.FavoriteDto", "rp": "Praktikum542_FavoriteDto.html", "cl": 0, "ucl": 7, "cal": 7, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.DTOs.ForgotPasswordDto", "rp": "Praktikum542_ForgotPasswordDto.html", "cl": 1, "ucl": 0, "cal": 1, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.DTOs.LoginDto", "rp": "Praktikum542_LoginDto.html", "cl": 2, "ucl": 0, "cal": 2, "tl": 8, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.DTOs.PagedResultDto\u003CT\u003E", "rp": "Praktikum542_PagedResultDto_1.html", "cl": 0, "ucl": 7, "cal": 7, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.DTOs.ProfileDto", "rp": "Praktikum542_ProfileDto.html", "cl": 0, "ucl": 10, "cal": 10, "tl": 16, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.DTOs.RegisterRequestDto", "rp": "Praktikum542_RegisterRequestDto.html", "cl": 0, "ucl": 7, "cal": 7, "tl": 34, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.DTOs.ResetPasswordDto", "rp": "Praktikum542_ResetPasswordDto.html", "cl": 0, "ucl": 2, "cal": 2, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.DTOs.PagedResultDto\u003CT\u003E", "rp": "Praktikum542_PagedResultDto_1.html", "cl": 7, "ucl": 0, "cal": 7, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.DTOs.ProfileDto", "rp": "Praktikum542_ProfileDto.html", "cl": 10, "ucl": 0, "cal": 10, "tl": 16, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.DTOs.RegisterRequestDto", "rp": "Praktikum542_RegisterRequestDto.html", "cl": 7, "ucl": 0, "cal": 7, "tl": 34, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.DTOs.ResetPasswordDto", "rp": "Praktikum542_ResetPasswordDto.html", "cl": 2, "ucl": 0, "cal": 2, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.DTOs.ReviewDto", "rp": "Praktikum542_ReviewDto.html", "cl": 0, "ucl": 7, "cal": 7, "tl": 19, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.DTOs.SavedPersonDto", "rp": "Praktikum542_SavedPersonDto.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 14, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.DTOs.StatisticsDto", "rp": "Praktikum542_StatisticsDto.html", "cl": 0, "ucl": 12, "cal": 12, "tl": 26, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.DTOs.TokenResponceDto", "rp": "Praktikum542_TokenResponceDto.html", "cl": 0, "ucl": 1, "cal": 1, "tl": 7, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.DTOs.TokenResponceDto", "rp": "Praktikum542_TokenResponceDto.html", "cl": 1, "ucl": 0, "cal": 1, "tl": 7, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.DTOs.TopTourDto", "rp": "Praktikum542_TopTourDto.html", "cl": 0, "ucl": 4, "cal": 4, "tl": 26, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.DTOs.TourAssetDto", "rp": "Praktikum542_TourAssetDto.html", "cl": 0, "ucl": 2, "cal": 2, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.DTOs.TourDto", "rp": "Praktikum542_TourDto.html", "cl": 9, "ucl": 0, "cal": 9, "tl": 15, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
@@ -329,43 +329,43 @@ var assemblies = [
       { "name": "Praktikum542.DTOs.UpdateUserRoleDto", "rp": "Praktikum542_UpdateUserRoleDto.html", "cl": 0, "ucl": 1, "cal": 1, "tl": 12, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.DTOs.UpdateUserStatusDto", "rp": "Praktikum542_UpdateUserStatusDto.html", "cl": 0, "ucl": 1, "cal": 1, "tl": 12, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Exceptions.AppException", "rp": "Praktikum542_AppException.html", "cl": 5, "ucl": 0, "cal": 5, "tl": 12, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Middleware.RequestLoggingMiddleware", "rp": "Praktikum542_RequestLoggingMiddleware.html", "cl": 0, "ucl": 18, "cal": 18, "tl": 34, "cb": 0, "tb": 6, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Models.ApiErrorResponse", "rp": "Praktikum542_ApiErrorResponse.html", "cl": 0, "ucl": 3, "cal": 3, "tl": 9, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Middleware.RequestLoggingMiddleware", "rp": "Praktikum542_RequestLoggingMiddleware.html", "cl": 18, "ucl": 0, "cal": 18, "tl": 34, "cb": 5, "tb": 6, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Models.ApiErrorResponse", "rp": "Praktikum542_ApiErrorResponse.html", "cl": 3, "ucl": 0, "cal": 3, "tl": 9, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Models.Booking", "rp": "Praktikum542_Booking.html", "cl": 13, "ucl": 2, "cal": 15, "tl": 37, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Models.BookingPerson", "rp": "Praktikum542_BookingPerson.html", "cl": 6, "ucl": 1, "cal": 7, "tl": 21, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Models.Credential", "rp": "Praktikum542_Credential.html", "cl": 0, "ucl": 14, "cal": 14, "tl": 35, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Models.Credential", "rp": "Praktikum542_Credential.html", "cl": 14, "ucl": 0, "cal": 14, "tl": 35, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Models.ErrorViewModel", "rp": "Praktikum542_ErrorViewModel.html", "cl": 0, "ucl": 2, "cal": 2, "tl": 9, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Models.Favorite", "rp": "Praktikum542_Favorite.html", "cl": 6, "ucl": 0, "cal": 6, "tl": 19, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Models.PasswordResetToken", "rp": "Praktikum542_PasswordResetToken.html", "cl": 0, "ucl": 7, "cal": 7, "tl": 21, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Models.Penalty", "rp": "Praktikum542_Penalty.html", "cl": 4, "ucl": 1, "cal": 5, "tl": 17, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Models.Favorite", "rp": "Praktikum542_Favorite.html", "cl": 0, "ucl": 6, "cal": 6, "tl": 19, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Models.PasswordResetToken", "rp": "Praktikum542_PasswordResetToken.html", "cl": 6, "ucl": 1, "cal": 7, "tl": 21, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Models.Penalty", "rp": "Praktikum542_Penalty.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 17, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Models.PraktikumContext", "rp": "Praktikum542_PraktikumContext.html", "cl": 367, "ucl": 3, "cal": 370, "tl": 415, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Models.RefreshToken", "rp": "Praktikum542_RefreshToken.html", "cl": 0, "ucl": 7, "cal": 7, "tl": 21, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Models.Review", "rp": "Praktikum542_Review.html", "cl": 0, "ucl": 10, "cal": 10, "tl": 27, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Models.SavedPerson", "rp": "Praktikum542_SavedPerson.html", "cl": 6, "ucl": 1, "cal": 7, "tl": 21, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Models.SavedPerson", "rp": "Praktikum542_SavedPerson.html", "cl": 0, "ucl": 7, "cal": 7, "tl": 21, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Models.Tour", "rp": "Praktikum542_Tour.html", "cl": 13, "ucl": 0, "cal": 13, "tl": 33, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Models.TourAsset", "rp": "Praktikum542_TourAsset.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 17, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Models.TourType", "rp": "Praktikum542_TourType.html", "cl": 3, "ucl": 0, "cal": 3, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Models.UserDetail", "rp": "Praktikum542_UserDetail.html", "cl": 0, "ucl": 8, "cal": 8, "tl": 23, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Models.UserDetail", "rp": "Praktikum542_UserDetail.html", "cl": 8, "ucl": 0, "cal": 8, "tl": 23, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Repositories.AdminRepository", "rp": "Praktikum542_AdminRepository.html", "cl": 0, "ucl": 63, "cal": 63, "tl": 99, "cb": 0, "tb": 4, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Repositories.BookingRepository", "rp": "Praktikum542_BookingRepository.html", "cl": 19, "ucl": 28, "cal": 47, "tl": 72, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Repositories.CredentialsRepository", "rp": "Praktikum542_CredentialsRepository.html", "cl": 0, "ucl": 36, "cal": 36, "tl": 60, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Repositories.FavoriteRepository", "rp": "Praktikum542_FavoriteRepository.html", "cl": 25, "ucl": 0, "cal": 25, "tl": 46, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Repositories.PasswordResetRepository", "rp": "Praktikum542_PasswordResetRepository.html", "cl": 0, "ucl": 25, "cal": 25, "tl": 39, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Repositories.BookingRepository", "rp": "Praktikum542_BookingRepository.html", "cl": 23, "ucl": 24, "cal": 47, "tl": 72, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Repositories.CredentialsRepository", "rp": "Praktikum542_CredentialsRepository.html", "cl": 32, "ucl": 4, "cal": 36, "tl": 60, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Repositories.FavoriteRepository", "rp": "Praktikum542_FavoriteRepository.html", "cl": 0, "ucl": 25, "cal": 25, "tl": 46, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Repositories.PasswordResetRepository", "rp": "Praktikum542_PasswordResetRepository.html", "cl": 25, "ucl": 0, "cal": 25, "tl": 39, "cb": 2, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Repositories.ReviewRepository", "rp": "Praktikum542_ReviewRepository.html", "cl": 0, "ucl": 33, "cal": 33, "tl": 55, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Repositories.SavedPersonRepository", "rp": "Praktikum542_SavedPersonRepository.html", "cl": 8, "ucl": 13, "cal": 21, "tl": 34, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Repositories.TourRepository", "rp": "Praktikum542_TourRepository.html", "cl": 9, "ucl": 49, "cal": 58, "tl": 102, "cb": 0, "tb": 16, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Repositories.SavedPersonRepository", "rp": "Praktikum542_SavedPersonRepository.html", "cl": 0, "ucl": 21, "cal": 21, "tl": 34, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Repositories.TourRepository", "rp": "Praktikum542_TourRepository.html", "cl": 30, "ucl": 28, "cal": 58, "tl": 102, "cb": 10, "tb": 16, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Praktikum542.Services.AdminService", "rp": "Praktikum542_AdminService.html", "cl": 0, "ucl": 110, "cal": 110, "tl": 153, "cb": 0, "tb": 36, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Services.AuthentificationService", "rp": "Praktikum542_AuthentificationService.html", "cl": 23, "ucl": 189, "cal": 212, "tl": 313, "cb": 2, "tb": 62, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Services.BookingPaginationExtensions", "rp": "Praktikum542_BookingPaginationExtensions.html", "cl": 0, "ucl": 18, "cal": 18, "tl": 41, "cb": 0, "tb": 4, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Services.BookingService", "rp": "Praktikum542_BookingService.html", "cl": 92, "ucl": 93, "cal": 185, "tl": 240, "cb": 22, "tb": 78, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Services.FavoriteService", "rp": "Praktikum542_FavoriteService.html", "cl": 36, "ucl": 0, "cal": 36, "tl": 59, "cb": 6, "tb": 6, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Services.PagedResult\u003CT\u003E", "rp": "Praktikum542_PagedResult_1.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 41, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Services.ReviewService", "rp": "Praktikum542_ReviewService.html", "cl": 0, "ucl": 77, "cal": 77, "tl": 110, "cb": 0, "tb": 18, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Services.SavedPersonService", "rp": "Praktikum542_SavedPersonService.html", "cl": 9, "ucl": 24, "cal": 33, "tl": 55, "cb": 2, "tb": 4, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Services.SmtpEmailService", "rp": "Praktikum542_SmtpEmailService.html", "cl": 0, "ucl": 29, "cal": 29, "tl": 48, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Services.TourService", "rp": "Praktikum542_TourService.html", "cl": 22, "ucl": 176, "cal": 198, "tl": 264, "cb": 1, "tb": 42, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Praktikum542.Services.UserFilteringExtensions", "rp": "Praktikum542_UserFilteringExtensions.html", "cl": 0, "ucl": 9, "cal": 9, "tl": 20, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Program", "rp": "Praktikum542_Program.html", "cl": 0, "ucl": 176, "cal": 176, "tl": 216, "cb": 0, "tb": 6, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Services.AuthentificationService", "rp": "Praktikum542_AuthentificationService.html", "cl": 168, "ucl": 44, "cal": 212, "tl": 313, "cb": 34, "tb": 62, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Services.BookingPaginationExtensions", "rp": "Praktikum542_BookingPaginationExtensions.html", "cl": 18, "ucl": 0, "cal": 18, "tl": 41, "cb": 2, "tb": 4, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Services.BookingService", "rp": "Praktikum542_BookingService.html", "cl": 85, "ucl": 100, "cal": 185, "tl": 240, "cb": 25, "tb": 78, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Services.FavoriteService", "rp": "Praktikum542_FavoriteService.html", "cl": 0, "ucl": 36, "cal": 36, "tl": 59, "cb": 0, "tb": 6, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Services.PagedResult\u003CT\u003E", "rp": "Praktikum542_PagedResult_1.html", "cl": 5, "ucl": 0, "cal": 5, "tl": 41, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Services.ReviewService", "rp": "Praktikum542_ReviewService.html", "cl": 13, "ucl": 64, "cal": 77, "tl": 110, "cb": 2, "tb": 18, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Services.SavedPersonService", "rp": "Praktikum542_SavedPersonService.html", "cl": 0, "ucl": 33, "cal": 33, "tl": 55, "cb": 0, "tb": 4, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Services.SmtpEmailService", "rp": "Praktikum542_SmtpEmailService.html", "cl": 5, "ucl": 24, "cal": 29, "tl": 48, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Services.TourService", "rp": "Praktikum542_TourService.html", "cl": 48, "ucl": 150, "cal": 198, "tl": 264, "cb": 4, "tb": 42, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Praktikum542.Services.UserFilteringExtensions", "rp": "Praktikum542_UserFilteringExtensions.html", "cl": 8, "ucl": 1, "cal": 9, "tl": 20, "cb": 1, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Program", "rp": "Praktikum542_Program.html", "cl": 160, "ucl": 16, "cal": 176, "tl": 216, "cb": 5, "tb": 6, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
     ]},
 ];
 
@@ -380,12 +380,6 @@ var riskHotspotMetrics = [
 
 var riskHotspots = [
   {
-    "assembly": "Praktikum542", "class": "Praktikum542.Services.BookingService", "reportPath": "Praktikum542_BookingService.html", "methodName": "GetMy(System.Int32)", "methodShortName": "GetMy(...)", "fileIndex": 0, "line": 100,
-    "metrics": [
-      { "value": 420, "exceeded": true },
-      { "value": 20, "exceeded": true },
-    ]},
-  {
     "assembly": "Praktikum542", "class": "Praktikum542.Services.BookingService", "reportPath": "Praktikum542_BookingService.html", "methodName": "GetAll(System.String)", "methodShortName": "GetAll(...)", "fileIndex": 0, "line": 143,
     "metrics": [
       { "value": 420, "exceeded": true },
@@ -398,19 +392,7 @@ var riskHotspots = [
       { "value": 18, "exceeded": true },
     ]},
   {
-    "assembly": "Praktikum542", "class": "Praktikum542.Repositories.TourRepository", "reportPath": "Praktikum542_TourRepository.html", "methodName": "Filter(System.String,System.Nullable\u00601\u003CSystem.Decimal\u003E,System.Nullable\u00601\u003CSystem.Decimal\u003E,System.Nullable\u00601\u003CSystem.Int32\u003E,System.Nullable\u00601\u003CSystem.Int32\u003E,System.Nullable\u00601\u003CSystem.Int32\u003E,System.Int32,System.Int32)", "methodShortName": "Filter(...)", "fileIndex": 0, "line": 64,
-    "metrics": [
-      { "value": 272, "exceeded": true },
-      { "value": 16, "exceeded": true },
-    ]},
-  {
     "assembly": "Praktikum542", "class": "Praktikum542.Services.AdminService", "reportPath": "Praktikum542_AdminService.html", "methodName": "UpdateUserData(System.Int32,System.Int32,Praktikum542.DTOs.UpdateProfileDto)", "methodShortName": "UpdateUserData(...)", "fileIndex": 0, "line": 57,
-    "metrics": [
-      { "value": 272, "exceeded": true },
-      { "value": 16, "exceeded": true },
-    ]},
-  {
-    "assembly": "Praktikum542", "class": "Praktikum542.Services.AuthentificationService", "reportPath": "Praktikum542_AuthentificationService.html", "methodName": "ChangePassword(System.Int32,Praktikum542.DTOs.ChangePasswordDto)", "methodShortName": "ChangePassword(...)", "fileIndex": 0, "line": 262,
     "metrics": [
       { "value": 272, "exceeded": true },
       { "value": 16, "exceeded": true },
@@ -422,28 +404,22 @@ var riskHotspots = [
       { "value": 14, "exceeded": false },
     ]},
   {
-    "assembly": "Praktikum542", "class": "Praktikum542.Controllers.AuthController", "reportPath": "Praktikum542_AuthController.html", "methodName": "Register()", "methodShortName": "Register()", "fileIndex": 0, "line": 77,
-    "metrics": [
-      { "value": 210, "exceeded": true },
-      { "value": 14, "exceeded": false },
-    ]},
-  {
-    "assembly": "Praktikum542", "class": "Praktikum542.Services.AuthentificationService", "reportPath": "Praktikum542_AuthentificationService.html", "methodName": "RegisterUser()", "methodShortName": "RegisterUser()", "fileIndex": 0, "line": 101,
-    "metrics": [
-      { "value": 210, "exceeded": true },
-      { "value": 14, "exceeded": false },
-    ]},
-  {
-    "assembly": "Praktikum542", "class": "Praktikum542.Services.ReviewService", "reportPath": "Praktikum542_ReviewService.html", "methodName": "Create(System.Int32,Praktikum542.DTOs.CreateReviewDto)", "methodShortName": "Create(...)", "fileIndex": 0, "line": 22,
-    "metrics": [
-      { "value": 210, "exceeded": true },
-      { "value": 14, "exceeded": false },
-    ]},
-  {
     "assembly": "Praktikum542", "class": "Praktikum542.Controllers.TourController", "reportPath": "Praktikum542_TourController.html", "methodName": "UploadTourImage()", "methodShortName": "UploadTourImage()", "fileIndex": 0, "line": 84,
     "metrics": [
       { "value": 156, "exceeded": true },
       { "value": 12, "exceeded": false },
+    ]},
+  {
+    "assembly": "Praktikum542", "class": "Praktikum542.Services.ReviewService", "reportPath": "Praktikum542_ReviewService.html", "methodName": "Create(System.Int32,Praktikum542.DTOs.CreateReviewDto)", "methodShortName": "Create(...)", "fileIndex": 0, "line": 22,
+    "metrics": [
+      { "value": 152, "exceeded": true },
+      { "value": 14, "exceeded": false },
+    ]},
+  {
+    "assembly": "Praktikum542", "class": "Praktikum542.Services.AuthentificationService", "reportPath": "Praktikum542_AuthentificationService.html", "methodName": "ChangePassword(System.Int32,Praktikum542.DTOs.ChangePasswordDto)", "methodShortName": "ChangePassword(...)", "fileIndex": 0, "line": 262,
+    "metrics": [
+      { "value": 116, "exceeded": true },
+      { "value": 16, "exceeded": true },
     ]},
   {
     "assembly": "Praktikum542", "class": "Praktikum542.Services.AdminService", "reportPath": "Praktikum542_AdminService.html", "methodName": "MapToDto(Praktikum542.Models.Credential)", "methodShortName": "MapToDto(...)", "fileIndex": 0, "line": 140,
@@ -452,10 +428,16 @@ var riskHotspots = [
       { "value": 10, "exceeded": false },
     ]},
   {
-    "assembly": "Praktikum542", "class": "Praktikum542.Services.AuthentificationService", "reportPath": "Praktikum542_AuthentificationService.html", "methodName": "ResetPassword(Praktikum542.DTOs.ResetPasswordDto)", "methodShortName": "ResetPassword(...)", "fileIndex": 0, "line": 226,
+    "assembly": "Praktikum542", "class": "Praktikum542.Services.BookingService", "reportPath": "Praktikum542_BookingService.html", "methodName": "Cancel(System.Int32,System.Int32)", "methodShortName": "Cancel(...)", "fileIndex": 0, "line": 173,
     "metrics": [
       { "value": 110, "exceeded": true },
       { "value": 10, "exceeded": false },
+    ]},
+  {
+    "assembly": "Praktikum542", "class": "Praktikum542.Controllers.AuthController", "reportPath": "Praktikum542_AuthController.html", "methodName": "Register()", "methodShortName": "Register()", "fileIndex": 0, "line": 77,
+    "metrics": [
+      { "value": 93, "exceeded": true },
+      { "value": 14, "exceeded": false },
     ]},
   {
     "assembly": "Praktikum542", "class": "Praktikum542.Controllers.AuthController", "reportPath": "Praktikum542_AuthController.html", "methodName": "ValidateAvatar(Microsoft.AspNetCore.Http.IFormFile)", "methodShortName": "ValidateAvatar(...)", "fileIndex": 0, "line": 433,
@@ -467,12 +449,6 @@ var riskHotspots = [
     "assembly": "Praktikum542", "class": "Praktikum542.Services.TourService", "reportPath": "Praktikum542_TourService.html", "methodName": "DeleteTour(System.Int32)", "methodShortName": "DeleteTour(...)", "fileIndex": 0, "line": 193,
     "metrics": [
       { "value": 72, "exceeded": true },
-      { "value": 8, "exceeded": false },
-    ]},
-  {
-    "assembly": "Praktikum542", "class": "Praktikum542.Services.AuthentificationService", "reportPath": "Praktikum542_AuthentificationService.html", "methodName": "Login(Praktikum542.DTOs.LoginDto)", "methodShortName": "Login(...)", "fileIndex": 0, "line": 154,
-    "metrics": [
-      { "value": 51, "exceeded": true },
       { "value": 8, "exceeded": false },
     ]},
   {
@@ -488,28 +464,22 @@ var riskHotspots = [
       { "value": 6, "exceeded": false },
     ]},
   {
-    "assembly": "Praktikum542", "class": "Praktikum542.Middleware.RequestLoggingMiddleware", "reportPath": "Praktikum542_RequestLoggingMiddleware.html", "methodName": "InvokeAsync()", "methodShortName": "InvokeAsync()", "fileIndex": 0, "line": 17,
-    "metrics": [
-      { "value": 42, "exceeded": true },
-      { "value": 6, "exceeded": false },
-    ]},
-  {
-    "assembly": "Praktikum542", "class": "Praktikum542.Services.AuthentificationService", "reportPath": "Praktikum542_AuthentificationService.html", "methodName": "NormalizePhone(System.String)", "methodShortName": "NormalizePhone(...)", "fileIndex": 0, "line": 52,
-    "metrics": [
-      { "value": 42, "exceeded": true },
-      { "value": 6, "exceeded": false },
-    ]},
-  {
-    "assembly": "Praktikum542", "class": "Program", "reportPath": "Praktikum542_Program.html", "methodName": "\u003CMain\u003E$(System.String[])", "methodShortName": "\u003CMain\u003E$(...)", "fileIndex": 0, "line": 17,
-    "metrics": [
-      { "value": 42, "exceeded": true },
-      { "value": 6, "exceeded": false },
-    ]},
-  {
     "assembly": "Praktikum542", "class": "Praktikum542.Services.BookingService", "reportPath": "Praktikum542_BookingService.html", "methodName": "Create(System.Int32,Praktikum542.DTOs.CreateBookingDto)", "methodShortName": "Create(...)", "fileIndex": 0, "line": 22,
     "metrics": [
-      { "value": 28, "exceeded": false },
+      { "value": 29, "exceeded": false },
       { "value": 26, "exceeded": true },
+    ]},
+  {
+    "assembly": "Praktikum542", "class": "Praktikum542.Services.BookingService", "reportPath": "Praktikum542_BookingService.html", "methodName": "GetMy(System.Int32)", "methodShortName": "GetMy(...)", "fileIndex": 0, "line": 100,
+    "metrics": [
+      { "value": 20, "exceeded": false },
+      { "value": 20, "exceeded": true },
+    ]},
+  {
+    "assembly": "Praktikum542", "class": "Praktikum542.Repositories.TourRepository", "reportPath": "Praktikum542_TourRepository.html", "methodName": "Filter(System.String,System.Nullable\u00601\u003CSystem.Decimal\u003E,System.Nullable\u00601\u003CSystem.Decimal\u003E,System.Nullable\u00601\u003CSystem.Int32\u003E,System.Nullable\u00601\u003CSystem.Int32\u003E,System.Nullable\u00601\u003CSystem.Int32\u003E,System.Int32,System.Int32)", "methodShortName": "Filter(...)", "fileIndex": 0, "line": 64,
+    "metrics": [
+      { "value": 17, "exceeded": false },
+      { "value": 16, "exceeded": true },
     ]},
 ];
 

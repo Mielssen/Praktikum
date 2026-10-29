@@ -53,21 +53,27 @@ namespace Praktikum542.Repositories
         }
 
         public (List<Tour> Items, int TotalCount) Filter(
-            string? search,
-            decimal? minPrice,
-            decimal? maxPrice,
-            int? minDays,
-            int? maxDays,
-            int? typeId,
-            int page = 1,
-            int pageSize = 6)
+        string? search,
+        decimal? minPrice,
+        decimal? maxPrice,
+        int? minDays,
+        int? maxDays,
+        int? typeId,
+        int page = 1,
+        int pageSize = 6)
         {
-            var query = _context.Tours
-                .Include(t => t.TourAssets)
-                .AsQueryable();
+            if (page < 1)
+                page = 1;
+
+            if (pageSize < 1)
+                pageSize = 6;
+
+            var query = _context.Tours.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
-                query = query.Where(t => t.Name.Contains(search) || (t.Description != null && t.Description.Contains(search)));
+                query = query.Where(t =>
+                    t.Name.Contains(search) ||
+                    (t.Description != null && t.Description.Contains(search)));
 
             if (minPrice.HasValue)
                 query = query.Where(t => t.Price >= minPrice.Value);
@@ -86,14 +92,11 @@ namespace Praktikum542.Repositories
 
             int totalCount = query.Count();
 
-     
-            if (page < 1) page = 1;
-            if (pageSize < 1) pageSize = 6;
-
             var items = query
                 .OrderBy(t => t.TourId)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .Include(t => t.TourAssets)
                 .ToList();
 
             return (items, totalCount);

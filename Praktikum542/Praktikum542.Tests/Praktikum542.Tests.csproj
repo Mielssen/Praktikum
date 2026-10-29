@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageReference Include="coverlet.collector" Version="10.1.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -33,5 +34,11 @@
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="ToderikoBenchmarkRunner/**/*.cs" />
+		<Content Remove="ToderikoBenchmarkRunner/**" />
+		<None Remove="ToderikoBenchmarkRunner/**" />
+	</ItemGroup>
 
 </Project>
