@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Praktikum542.DTOs;
 using Praktikum542.Models;
 using Praktikum542.Services;
-using System.Security.Claims;
+using Praktikum542.Helpers;
 
 namespace Praktikum542.Controllers
 {
@@ -48,9 +48,7 @@ namespace Praktikum542.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult GetMy()
         {
-            var credentialId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
+            var credentialId = User.GetCredentialId();
 
             return Ok(_service.GetMy(credentialId));
         }
@@ -79,9 +77,7 @@ namespace Praktikum542.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Add([FromBody] AddFavoriteDto dto)
         {
-            var credentialId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
+            var credentialId = User.GetCredentialId();
 
             _service.Add(credentialId, dto.TourId);
             return Ok("Додано в обране");
@@ -101,9 +97,7 @@ namespace Praktikum542.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Delete(int tourId)
         {
-            var credentialId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
+            var credentialId = User.GetCredentialId();
 
             _service.Delete(credentialId, tourId);
             return Ok("Видалено з обраного");

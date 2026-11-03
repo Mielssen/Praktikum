@@ -157,6 +157,22 @@ try
     {
         options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
+        options.GlobalLimiter =
+            PartitionedRateLimiter.Create<HttpContext, string>(context =>
+            {
+                var ipAddress = context.Connection.RemoteIpAddress?.ToString()
+                                ?? "unknown";
+
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    ipAddress,
+                    _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 100,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0,
+                        AutoReplenishment = true
+                    });
+            });
         options.AddPolicy("auth-login", context =>
             RateLimitPartition.GetFixedWindowLimiter(
                 context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
