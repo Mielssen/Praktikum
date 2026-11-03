@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Praktikum542.DTOs;
 using Praktikum542.Exceptions;
 using Praktikum542.Services;
@@ -51,7 +51,7 @@ public class AuthenticationExceptionTests
             service.ResetPassword(dto));
 
         Assert.Equal("INVALID_PASSWORD", exception.Code);
-        Assert.Equal("Пароль має містити мінімум 6 символів", exception.Message);
+        Assert.Equal("Пароль має містити 12–48 символів, великі, малі літери і цифри", exception.Message);
     }
     [Fact]
     public void ChangePassword_ShouldThrowAppException_WhenPasswordsDoNotMatch()

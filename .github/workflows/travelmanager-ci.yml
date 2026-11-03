@@ -6,7 +6,7 @@ on:
       - '.github/workflows/travelmanager-ci.yml'
   push:
     branches:
-      - 'feature/travelmanager-docker-ci'
+      - main
     paths:
       - 'Praktikum542/**'
       - '.github/workflows/travelmanager-ci.yml'
@@ -26,7 +26,7 @@ jobs:
       - name: Restore test dependencies
         run: dotnet restore Praktikum542.Tests/Praktikum542.Tests.csproj
       - name: Run Unit tests
-        run: dotnet test Praktikum542.Tests/Praktikum542.Tests.csproj --no-restore --filter 'FullyQualifiedName~UnitTests' --logger 'console;verbosity=normal'
+        run: dotnet test Praktikum542.Tests/Praktikum542.Tests.csproj --no-restore --filter 'FullyQualifiedName~UnitTests|FullyQualifiedName~MockingTests|FullyQualifiedName~ExceptionTests|FullyQualifiedName~ReliabilityTests' --logger 'console;verbosity=normal'
   docker-build:
     needs: unit-tests
     runs-on: ubuntu-latest
