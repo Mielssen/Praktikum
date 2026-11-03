@@ -1,0 +1,42 @@
+name: travelmanager
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: travelmanager
+      MYSQL_USER: travelmanager
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env.docker}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Set DB_ROOT_PASSWORD in .env.docker}
+    volumes:
+      - travelmanager_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks: [internal]
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "server=db;port=3306;database=travelmanager;user=travelmanager;password=${DB_PASSWORD:?Set DB_PASSWORD in .env.docker};"
+      Jwt__Key: ${JWT_KEY:?Set JWT_KEY in .env.docker}
+      Jwt__Issuer: travelmanager
+      Jwt__Audience: travelmanagerUsers
+      Jwt__ExpiresInMinutes: "60"
+      Frontend__ResetPasswordUrl: http://localhost:5080/reset-password.html
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [internal]
+networks:
+  internal:
+volumes:
+  travelmanager_mysql:

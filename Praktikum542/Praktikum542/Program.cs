@@ -238,6 +238,7 @@ try
         });
     });
 
+    app.MapGet("/", () => Results.Redirect("/index.html", permanent: false));
     app.UseDefaultFiles();
     app.UseStaticFiles();
 
