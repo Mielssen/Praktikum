@@ -1,8 +1,15 @@
-﻿namespace Praktikum542.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Praktikum542.DTOs
 {
     public class LoginDto
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        [Required(ErrorMessage = "Email обов'язковий")]
+        [EmailAddress(ErrorMessage = "Неправильний формат пошти")]
+        [MaxLength(100)]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Пароль обов'язковий")]
+        public string Password { get; set; } = string.Empty;
     }
 }

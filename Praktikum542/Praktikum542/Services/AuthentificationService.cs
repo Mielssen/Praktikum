@@ -222,29 +222,56 @@ namespace Praktikum542.Services
             _logger.LogInformation("Reset-token створено для UserID={UserId}", user.CredentialId);
         }
 
+
         public void ResetPassword(ResetPasswordDto dto)
         {
+            if (dto == null)
+                throw new AppException("NULL", "Дані не передані");
+
             if (string.IsNullOrWhiteSpace(dto.Token))
                 throw new AppException("INVALID_TOKEN", "Токен обов'язковий");
 
-            if (string.IsNullOrWhiteSpace(dto.NewPassword) || dto.NewPassword.Length < 6)
-                throw new AppException("INVALID_PASSWORD", "Пароль має містити мінімум 6 символів");
+            if (string.IsNullOrWhiteSpace(dto.NewPassword) ||
+                dto.NewPassword.Length < 12 ||
+                dto.NewPassword.Length > 48 ||
+                !dto.NewPassword.Any(char.IsLower) ||
+                !dto.NewPassword.Any(char.IsUpper) ||
+                !dto.NewPassword.Any(char.IsDigit))
+            {
+                throw new AppException(
+                    "INVALID_PASSWORD",
+                    "Пароль має містити 12–48 символів, великі, малі літери і цифри");
+            }
 
             var tokenHash = HashToken(dto.Token);
+
             var resetToken = _resetRepo.GetValidToken(tokenHash);
+
             if (resetToken == null)
-                throw new AppException("INVALID_TOKEN", "Токен недійсний або прострочений");
+                throw new AppException(
+                    "INVALID_TOKEN",
+                    "Токен недійсний або прострочений");
 
             var user = _repo.GetById(resetToken.CredentialId);
+
             if (user == null)
                 throw new AppException("NOT_FOUND", "Користувача не знайдено");
 
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-            _repo.UpdatePassword(user);
-            _resetRepo.MarkUsed(resetToken);
+            if (!_resetRepo.TryMarkUsed(tokenHash))
+                throw new AppException(
+                    "INVALID_TOKEN",
+                    "Токен вже використаний або прострочений");
 
-            _logger.LogInformation("Пароль скинуто для UserID={UserId}", user.CredentialId);
+            user.PasswordHash =
+                BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+            _repo.UpdatePassword(user);
+
+            _logger.LogInformation(
+                "Пароль скинуто для UserID={UserId}",
+                user.CredentialId);
         }
+
 
         private string GenerateResetToken()
         {

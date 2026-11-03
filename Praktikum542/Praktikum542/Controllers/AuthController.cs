@@ -1,10 +1,10 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Praktikum542.DTOs;
 using Praktikum542.Models;
 using Praktikum542.Repositories;
 using Praktikum542.Services;
+using Praktikum542.Helpers;
 
 namespace Praktikum542.Controllers
 {
@@ -187,9 +187,7 @@ namespace Praktikum542.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult ChangePassword([FromBody] ChangePasswordDto dto)
         {
-            var credentialId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
+            var credentialId = User.GetCredentialId();
 
             _authService.ChangePassword(credentialId, dto);
 
@@ -225,9 +223,7 @@ namespace Praktikum542.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetProfile()
         {
-            var credentialId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
+            var credentialId = User.GetCredentialId();
 
             var credential = _repo.GetById(credentialId);
             var detail = _repo.GetUserDetail(credentialId);
@@ -276,9 +272,7 @@ namespace Praktikum542.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult UpdateProfile([FromBody] UpdateProfileDto dto)
         {
-            var credentialId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
+            var credentialId = User.GetCredentialId();
 
             var detail = _repo.GetUserDetail(credentialId);
 
@@ -335,9 +329,7 @@ namespace Praktikum542.Controllers
             if (validationError != null)
                 return BadRequest(validationError);
 
-            var credentialId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
+            var credentialId = User.GetCredentialId();
 
             var detail = _repo.GetUserDetail(credentialId);
 

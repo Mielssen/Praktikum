@@ -41,6 +41,7 @@ namespace Praktikum542.Controllers
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
+
         {
             var credentialId = int.Parse(
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value
