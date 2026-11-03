@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Praktikum542.DTOs;
 using Praktikum542.Exceptions;
@@ -48,7 +48,7 @@ public class PasswordResetExceptionTests
             service.ResetPassword(new ResetPasswordDto
             {
                 Token = "token-that-was-never-issued",
-                NewPassword = "ValidPass1"
+                NewPassword = "ValidPassword123!"
             }));
 
         Assert.Equal("INVALID_TOKEN", exception.Code);
@@ -68,7 +68,7 @@ public class PasswordResetExceptionTests
             service.ResetPassword(new ResetPasswordDto
             {
                 Token = "expired-token",
-                NewPassword = "ValidPass1"
+                NewPassword = "ValidPassword123!"
             }));
 
         Assert.Equal("INVALID_TOKEN", exception.Code);
@@ -87,7 +87,7 @@ public class PasswordResetExceptionTests
             service.ResetPassword(new ResetPasswordDto
             {
                 Token = "used-token",
-                NewPassword = "ValidPass1"
+                NewPassword = "ValidPassword123!"
             }));
 
         Assert.Equal("INVALID_TOKEN", exception.Code);
