@@ -52,17 +52,18 @@ async function login() {
 async function register() {
     clearErrors();
 
+    const formData = new FormData();
+
+    formData.append("Email", get("regEmail").value.trim());
+    formData.append("Password", get("regPassword").value);
+    formData.append("Name", get("regName").value.trim());
+    formData.append("Phone", get("regPhone").value.trim());
+    formData.append("PassportData", get("regPassport").value.trim());
+    formData.append("DateOfBirth", get("regBirth").value);
+
     const res = await fetch(API + "/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            email: get("regEmail").value,
-            password: get("regPassword").value,
-            name: get("regName").value,
-            phone: get("regPhone").value,
-            passportData: get("regPassport").value,
-            dateOfBirth: get("regBirth").value
-        })
+        body: formData
     });
 
     const data = await safeJson(res);
