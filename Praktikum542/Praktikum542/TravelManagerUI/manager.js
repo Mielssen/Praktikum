@@ -1,4 +1,4 @@
-const API = "http://localhost:5265/api/tours";
+const API = "/api/tours";
 const token = localStorage.getItem("token");
 
 let editId = null;
@@ -10,7 +10,7 @@ if (!token) {
 }
 
 async function loadTourTypes() {
-    const res = await fetch("http://localhost:5265/api/tours/types");
+    const res = await fetch("/api/tours/types");
     tourTypes = await res.json();
 
     const select = document.getElementById("typeId");
@@ -326,7 +326,7 @@ async function loadBookings(page = 1, status = currentStatusFilter) {
     currentBookingPage = page;
     currentStatusFilter = status;
 
-    let url = `http://localhost:5265/api/bookings?page=${page}&pageSize=${bookingPageSize}`;
+    let url = `/api/bookings?page=${page}&pageSize=${bookingPageSize}`;
     if (status) url += `&status=${status}`;
 
     const res = await fetch(url, {
@@ -497,7 +497,7 @@ function closeBookingDetailModal() {
 }
 
 async function updateBookingStatus(id, status) {
-    const res = await fetch(`http://localhost:5265/api/bookings/${id}/status`, {
+    const res = await fetch(`/api/bookings/${id}/status`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
