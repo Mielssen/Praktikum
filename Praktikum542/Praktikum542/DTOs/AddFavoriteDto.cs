@@ -1,7 +1,9 @@
-﻿namespace Praktikum542.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Praktikum542.DTOs;
+
+public class AddFavoriteDto
 {
-    public class AddFavoriteDto
-    {
-        public int TourId { get; set; }
-    }
+    [Range(1, int.MaxValue, ErrorMessage = "Некоректний ідентифікатор туру")]
+    public int TourId { get; set; }
 }

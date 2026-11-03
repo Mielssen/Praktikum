@@ -13,6 +13,7 @@ using Praktikum542.Repositories;
 using Praktikum542.Services;
 using Serilog;
 using System.Text;
+using System.Threading.RateLimiting;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -139,6 +140,28 @@ try
         };
     });
 
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+        options.GlobalLimiter =
+            PartitionedRateLimiter.Create<HttpContext, string>(context =>
+            {
+                var ipAddress = context.Connection.RemoteIpAddress?.ToString()
+                                ?? "unknown";
+
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    ipAddress,
+                    _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 100,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0,
+                        AutoReplenishment = true
+                    });
+            });
+    });
+
     var app = builder.Build();
 
     app.UseExceptionHandler(errorApp =>
@@ -188,6 +211,7 @@ try
 
     app.UseAuthentication();
     app.UseMiddleware<RequestLoggingMiddleware>();
+    app.UseRateLimiter();
     app.UseAuthorization();
 
     if (app.Environment.IsDevelopment())
