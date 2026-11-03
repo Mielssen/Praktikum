@@ -29,6 +29,23 @@ namespace Praktikum542.Repositories
         }
         public bool TryMarkUsed(string token)
         {
+            // EF Core InMemory cannot translate ExecuteUpdate. Keep the
+            // atomic database-side update for relational providers.
+            if (string.Equals(_context.Database.ProviderName, "Microsoft.EntityFrameworkCore.InMemory", StringComparison.Ordinal))
+            {
+                var validToken = _context.PasswordResetTokens.FirstOrDefault(t =>
+                    t.Token == token &&
+                    !t.Used &&
+                    t.ExpiresAt > DateTime.Now);
+
+                if (validToken == null)
+                    return false;
+
+                validToken.Used = true;
+                _context.SaveChanges();
+                return true;
+            }
+
             var affectedRows = _context.PasswordResetTokens
                 .Where(t =>
                     t.Token == token &&

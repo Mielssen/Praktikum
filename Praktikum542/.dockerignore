@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/TestResults/
+**/Coverage*/
+**/logs/
+**/.git/
+**/node_modules/
+**/appsettings.Development.json
+**/appsettings.json
+.env*
+!.env.docker.example
+*.user
+*.suo
