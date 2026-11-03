@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Praktikum542.Common;
 using Praktikum542.DTOs;
-using Praktikum542.Models;
 using Praktikum542.Services;
-using System.Security.Claims;
+using Praktikum542.Models;
 
 namespace Praktikum542.Controllers
 {
@@ -53,9 +53,7 @@ namespace Praktikum542.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Create([FromBody] CreateBookingDto dto)
         {
-            var credentialId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
+            var credentialId = User.GetUserId();
 
             _service.Create(credentialId, dto);
             return Ok("Бронювання створено");
@@ -67,7 +65,7 @@ namespace Praktikum542.Controllers
         /// <remarks>
         /// Потребує роль 'manager'.
         ///
-       /// Дозволені статуси: pending, confirmed, cancelled.
+        /// Дозволені статуси: pending, confirmed, cancelled.
         ///
         /// Приклад запиту:
         ///
@@ -86,7 +84,7 @@ namespace Praktikum542.Controllers
         /// <response code="400">Некоректний статус або бронювання не знайдено.</response>
         /// <response code="401">Користувач не авторизований.</response>
         /// <response code="403">Недостатньо прав (потрібна роль 'manager').</response>
-        [Authorize(Roles = "manager")]
+        [Authorize(Roles = UserRoles.Manager)]
         [HttpPut("{id}/status")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
@@ -106,7 +104,7 @@ namespace Praktikum542.Controllers
         ///
         /// Приклад запиту:
         ///
-      ///     GET /api/bookings?status=confirmed
+        ///     GET /api/bookings?status=confirmed
         ///
         /// Приклад успішної відповіді (200):
         ///
@@ -129,18 +127,17 @@ namespace Praktikum542.Controllers
         /// <response code="200">Список усіх знайдених бронювань.</response>
         /// <response code="401">Користувач не авторизований.</response>
         /// <response code="403">Недостатньо прав (потрібна роль 'manager').</response>
-        [Authorize(Roles = "manager")]
+        [Authorize(Roles = UserRoles.Manager)]
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public IActionResult GetAll(
-            [FromQuery] string? status,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+        [FromQuery] string? status,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
         {
-            var allBookings = _service.GetAll(status);
-            var result = allBookings.ApplyPagination(page, pageSize);
-
+            var result = _service.GetAll(status, page, pageSize);
             return Ok(result);
         }
 
@@ -172,9 +169,7 @@ namespace Praktikum542.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult GetMy()
         {
-            var credentialId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
+            var credentialId = User.GetUserId();
 
             return Ok(_service.GetMy(credentialId));
         }
@@ -232,9 +227,7 @@ namespace Praktikum542.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Cancel(int id)
         {
-            var credentialId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
+            var credentialId = User.GetUserId();
 
             var penaltyAmount = _service.Cancel(credentialId, id);
 

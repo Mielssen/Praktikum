@@ -85,9 +85,20 @@ try
 
     builder.Services.AddDbContext<PraktikumContext>(options =>
     {
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
         options.UseMySql(
-            builder.Configuration.GetConnectionString("DefaultConnection"),
-            new MySqlServerVersion(new Version(8, 0, 0))
+            connectionString,
+            new MySqlServerVersion(new Version(8, 0, 0)),
+            mySqlOptions =>
+            {
+                mySqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(5),
+                    errorNumbersToAdd: null);
+
+                mySqlOptions.CommandTimeout(30);
+            }
         );
     });
 
@@ -119,6 +130,8 @@ try
     builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
     var jwtSettings = builder.Configuration.GetSection("Jwt");
+
+    builder.Services.AddMemoryCache();
 
     builder.Services.AddAuthentication(options =>
     {
@@ -160,6 +173,38 @@ try
                         AutoReplenishment = true
                     });
             });
+        options.AddPolicy("auth-login", context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 5,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                }));
+
+        options.AddPolicy("auth-register", context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 3,
+                    Window = TimeSpan.FromMinutes(10),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                }));
+
+        options.AddPolicy("auth-forgot-password", context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 3,
+                    Window = TimeSpan.FromMinutes(10),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                }));
     });
 
     var app = builder.Build();
@@ -235,6 +280,7 @@ finally
 {
     Log.CloseAndFlush();
 }
+
 public partial class Program
 {
 }

@@ -2,7 +2,7 @@ using Praktikum542.Models;
 using Praktikum542.Repositories;
 using Praktikum542.Exceptions;
 using Praktikum542.DTOs;
-using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
+using Praktikum542.Common;
 
 namespace Praktikum542.Services
 {
@@ -57,8 +57,34 @@ namespace Praktikum542.Services
                 if (person.DateOfBirth == null)
                     throw new AppException("INVALID_PERSON", "Дата народження обов'язкова");
 
-                if (person.DateOfBirth > DateOnly.FromDateTime(DateTime.Now))
-                    throw new AppException("INVALID_PERSON", "Дата народження не може бути в майбутньому");
+
+                if (dto.NumberOfAdults < 0 || dto.NumberOfChildren < 0)
+                    throw new AppException(
+                        "INVALID_PERSONS",
+                        "Кількість дорослих і дітей не може бути від'ємною"
+                    );
+
+                if (dto.NumberOfAdults + dto.NumberOfChildren <= 0)
+                    throw new AppException(
+                        "INVALID_PERSONS",
+                        "У бронюванні має бути хоча б один учасник"
+                    );
+
+                if (dto.Persons == null ||
+                    dto.Persons.Count != dto.NumberOfAdults + dto.NumberOfChildren)
+                {
+                    throw new AppException(
+                        "INVALID_PERSONS",
+                        "Кількість учасників не співпадає з кількістю людей"
+                    );
+                }
+
+                if (dto.Persons.Count(p => p.IsChild) != dto.NumberOfChildren)
+                    throw new AppException(
+                        "INVALID_PERSONS",
+                        "Кількість дітей не співпадає з даними учасників"
+                    );
+
             }
 
             const decimal childDiscount = 0.5m;
@@ -71,7 +97,7 @@ namespace Praktikum542.Services
                 TourId = dto.TourId,
                 StartDate = startDate,
                 BookingDate = DateTime.Now,
-                Status = "pending",
+                Status = BookingStatuses.Pending,
                 NumberOfPeople = dto.NumberOfAdults + dto.NumberOfChildren,
                 TotalPrice = totalPrice,
                 Comment = dto.Comment
@@ -99,35 +125,21 @@ namespace Praktikum542.Services
         public List<BookingDto> GetMy(int credentialId)
         {
             var bookings = _repo.GetByCredentialId(credentialId);
-            return bookings.Select(b => new BookingDto
-            {
-                BookingId = b.BookingId,
-                TourId = b.TourId,
-                TourName = b.Tour.Name,
-                TourPrice = b.Tour.Price,
-                TourDurationDays = b.Tour.DurationDays,
-                UserName = b.Credential?.UserDetail?.Name,
-                UserEmail = b.Credential?.Email,
-                UserPhone = b.Credential?.UserDetail?.Phone,
-                UserPassportData = b.Credential?.UserDetail?.PassportData,
-                UserDateOfBirth = b.Credential?.UserDetail?.DateOfBirth,
-                StartDate = b.StartDate,
-                BookingDate = b.BookingDate.HasValue ? DateOnly.FromDateTime(b.BookingDate.Value) : null,
-                Status = b.Status,
-                NumberOfPeople = b.NumberOfPeople,
-                TotalPrice = b.TotalPrice,
-                Comment = b.Comment,
-                Persons = b.BookingPeople.Select(p => new BookingPersonDto
-                {
-                    Name = p.Name,
-                    PassportData = p.PassportData,
-                    DateOfBirth = p.DateOfBirth,
-                    IsChild = p.IsChild
-                }).ToList()
-            }).ToList();
+            return bookings.Select(MapToDto).ToList();
         }
+
         public void UpdateStatus(int bookingId, string status)
         {
+            if (status != BookingStatuses.Pending &&
+                status != BookingStatuses.Confirmed &&
+                status != BookingStatuses.Cancelled)
+            {
+                throw new AppException(
+                    "INVALID_STATUS",
+                    "Статус має бути pending, confirmed або cancelled"
+                );
+            }
+
             var booking = _repo.GetById(bookingId);
 
             if (booking == null)
@@ -135,14 +147,36 @@ namespace Praktikum542.Services
 
             booking.Status = status;
             _repo.Update(booking);
+
             _logger.LogInformation(
                 "Статус бронювання ID={BookingId} змінено на {Status}",
-                bookingId, status);
+                bookingId,
+                status
+            );
         }
-        public List<BookingDto> GetAll(string? status)
+        public PagedResult<BookingDto> GetAll(string? status,int page,int pageSize)
         {
-            var bookings = _repo.GetAll(status);
-            return bookings.Select(b => new BookingDto
+            if (page < 1)
+                page = 1;
+
+            if (pageSize < 1)
+                pageSize = 10;
+
+            var result = _repo.GetAllPaged(status, page, pageSize);
+
+            return new PagedResult<BookingDto>
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalItems = result.TotalItems,
+                TotalPages = (int)Math.Ceiling(
+                    (double)result.TotalItems / pageSize),
+                Items = result.Items.Select(MapToDto).ToList()
+            };
+        }
+        private static BookingDto MapToDto(Booking b)
+        {
+            return new BookingDto
             {
                 BookingId = b.BookingId,
                 TourId = b.TourId,
@@ -155,7 +189,9 @@ namespace Praktikum542.Services
                 UserPassportData = b.Credential?.UserDetail?.PassportData,
                 UserDateOfBirth = b.Credential?.UserDetail?.DateOfBirth,
                 StartDate = b.StartDate,
-                BookingDate = b.BookingDate.HasValue ? DateOnly.FromDateTime(b.BookingDate.Value) : null,
+                BookingDate = b.BookingDate.HasValue
+                    ? DateOnly.FromDateTime(b.BookingDate.Value)
+                    : null,
                 Status = b.Status,
                 NumberOfPeople = b.NumberOfPeople,
                 TotalPrice = b.TotalPrice,
@@ -167,8 +203,9 @@ namespace Praktikum542.Services
                     DateOfBirth = p.DateOfBirth,
                     IsChild = p.IsChild
                 }).ToList()
-            }).ToList();
+            };
         }
+
         public decimal Cancel(int credentialId, int bookingId)
         {
             var booking = _repo.GetById(bookingId);
@@ -185,7 +222,7 @@ namespace Praktikum542.Services
                     "Це не ваше бронювання"
                 );
 
-            if (booking.Status == "cancelled")
+            if (booking.Status == BookingStatuses.Cancelled)
                 throw new AppException(
                     "ALREADY_CANCELLED",
                     "Бронювання вже скасовано"
@@ -224,7 +261,7 @@ namespace Praktikum542.Services
                 );
             }
 
-            booking.Status = "cancelled";
+            booking.Status = BookingStatuses.Cancelled;
 
             _context.SaveChanges();
 
