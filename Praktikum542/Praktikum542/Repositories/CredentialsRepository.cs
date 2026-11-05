@@ -42,6 +42,7 @@ namespace Praktikum542.Repositories
         public UserDetail? GetUserDetail(int credentialId)
         {
             return _context.UserDetails
+                .AsNoTracking()
                 .FirstOrDefault(x => x.CredentialId == credentialId);
         }
 

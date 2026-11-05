@@ -15,6 +15,7 @@ namespace Praktikum542.Repositories
         public virtual List<Favorite> GetByCredentialId(int credentialId)
         {
             return _context.Favorites
+                .AsNoTracking()
                 .Include(f => f.Tour)
                 .Where(f => f.CredentialId == credentialId)
                 .ToList();
