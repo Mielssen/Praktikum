@@ -281,7 +281,7 @@ finally
 {
     Log.CloseAndFlush();
 }
-
+// Тест CI CD
 public partial class Program
 {
 }
