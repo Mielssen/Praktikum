@@ -67,6 +67,29 @@ namespace Praktikum542.Repositories
             _context.Bookings.Remove(booking);
             _context.SaveChanges();
         }
+        public (List<Booking> Items, int TotalItems) GetAllPaged(
+        string? status,
+        int page,
+        int pageSize)
+        {
+            var query = _context.Bookings.AsQueryable();
 
+            if (!string.IsNullOrWhiteSpace(status))
+                query = query.Where(b => b.Status == status);
+
+            var totalItems = query.Count();
+
+            var items = query
+                .Include(b => b.Tour)
+                .Include(b => b.BookingPeople)
+                .Include(b => b.Credential)
+                    .ThenInclude(c => c.UserDetail)
+                .OrderBy(b => b.BookingId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return (items, totalItems);
+        }
     }
 }
