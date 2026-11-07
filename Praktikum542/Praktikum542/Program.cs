@@ -22,7 +22,25 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
+
+    var envPath = Path.Combine(
+        Directory.GetCurrentDirectory(), ".env");
+
+    if (!File.Exists(envPath))
+    {
+        envPath = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            "Praktikum542",
+            ".env");
+    }
+
+    if (File.Exists(envPath))
+    {
+        DotNetEnv.Env.Load(envPath);
+    }
+
     var builder = WebApplication.CreateBuilder(args);
+
     builder.Host.UseSerilog();
 
     builder.Services.AddControllers();

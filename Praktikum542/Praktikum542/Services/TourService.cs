@@ -1,4 +1,4 @@
-﻿using Praktikum542.DTOs;
+using Praktikum542.DTOs;
 using Praktikum542.Models;
 using Praktikum542.Repositories;
 using Praktikum542.Exceptions;
@@ -7,6 +7,10 @@ namespace Praktikum542.Services
 {
     public class TourService
     {
+
+        private const string NotFoundCode = "NOT_FOUND";
+        private const string VideoAssetType = "video";
+
         private readonly TourRepository _repo;
         private readonly PraktikumContext _context;
         private readonly ILogger<TourService> _logger;
@@ -25,7 +29,7 @@ namespace Praktikum542.Services
 
             var typeExists = _context.TourTypes.Any(t => t.TypeId == dto.TypeId);
             if (!typeExists)
-                throw new AppException("NOT_FOUND", "Тип туру не знайдено");
+                throw new AppException(NotFoundCode, "Тип туру не знайдено");
 
             var tour = new Tour
             {
@@ -43,46 +47,28 @@ namespace Praktikum542.Services
             return tour.TourId;
         }
 
-        public void UpdateTour(int id, CreateTourDto dto)
+        private void UpdateTourAssets(int id, List<TourAssetDto>? assets)
         {
-            var tour = _repo.GetById(id);
-
-            if (tour == null)
-                throw new AppException("NOT_FOUND", "Тур не знайдено");
-
-            tour.Name = dto.Name.Trim();
-            tour.Description = dto.Description;
-            tour.Price = dto.Price;
-            tour.DurationDays = dto.DurationDays;
-            tour.AvailableFrom = dto.AvailableFrom;
-            tour.AvailableTo = dto.AvailableTo;
-            tour.TypeId = dto.TypeId;
-
-            _repo.Update(tour);
-
             var oldAssets = _context.TourAssets
                 .Where(x => x.TourId == id)
                 .ToList();
 
-            var newUrls = dto.Assets?.Select(a => a.Url).ToHashSet() ?? new HashSet<string>();
+            var newUrls = assets?.Select(a => a.Url).ToHashSet()
+                ?? new HashSet<string>();
 
             foreach (var asset in oldAssets)
             {
                 if (!newUrls.Contains(asset.Url))
                 {
-                    var folder = asset.AssetType == "video" ? "videos" : "images";
-                    var fileName = Path.GetFileName(asset.Url);
-                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folder, fileName);
-                    if (File.Exists(filePath))
-                        File.Delete(filePath);
+                    DeleteAssetFile(asset);
                 }
             }
 
             _context.TourAssets.RemoveRange(oldAssets);
 
-            if (dto.Assets != null)
+            if (assets != null)
             {
-                foreach (var asset in dto.Assets)
+                foreach (var asset in assets)
                 {
                     _context.TourAssets.Add(new TourAsset
                     {
@@ -94,40 +80,31 @@ namespace Praktikum542.Services
             }
 
             _context.SaveChanges();
+        }
+
+        public void UpdateTour(int id, CreateTourDto dto)
+        {
+            var tour = _repo.GetById(id);
+
+            if (tour == null)
+                throw new AppException(NotFoundCode, "Тур не знайдено");
+
+            tour.Name = dto.Name.Trim();
+            tour.Description = dto.Description;
+            tour.Price = dto.Price;
+            tour.DurationDays = dto.DurationDays;
+            tour.AvailableFrom = dto.AvailableFrom;
+            tour.AvailableTo = dto.AvailableTo;
+            tour.TypeId = dto.TypeId;
+
+            _repo.Update(tour);
+
+            UpdateTourAssets(id, dto.Assets);
             _logger.LogInformation("Оновлено тур ID={TourId}", id);
         }
 
-        public List<TourDto> GetAll()
+        private static TourDto MapToDto(Tour t)
         {
-            var tours = _repo.GetAll();
-
-            return tours.Select(t => new TourDto
-            {
-                TourId = t.TourId,
-                Name = t.Name,
-                Description = t.Description,
-                Price = t.Price,
-                DurationDays = t.DurationDays,
-                AvailableFrom = t.AvailableFrom,
-                AvailableTo = t.AvailableTo,
-                TypeId = t.TypeId,
-                Assets = t.TourAssets != null
-                    ? t.TourAssets.Select(a => new TourAssetDto
-                    {
-                        AssetType = a.AssetType,
-                        Url = a.Url
-                    }).ToList()
-                    : new List<TourAssetDto>()
-            }).ToList();
-        }
-
-        public TourDto GetById(int id)
-        {
-            var t = _repo.GetById(id);
-
-            if (t == null)
-                throw new AppException("NOT_FOUND", "Тур не знайдено");
-
             return new TourDto
             {
                 TourId = t.TourId,
@@ -148,36 +125,58 @@ namespace Praktikum542.Services
             };
         }
 
+        private static void DeleteAssetFile(TourAsset asset)
+        {
+            var folder = asset.AssetType == VideoAssetType
+                ? "videos"
+                : "images";
+
+            var fileName = Path.GetFileName(asset.Url);
+
+            var filePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                folder,
+                fileName
+            );
+
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+        }
+
+        public List<TourDto> GetAll()
+        {
+            var tours = _repo.GetAll();
+            return tours.Select(MapToDto).ToList();
+        }
+
+
+
+        public TourDto GetById(int id)
+        {
+            var tour = _repo.GetById(id);
+
+            if (tour == null)
+                throw new AppException(NotFoundCode, "Тур не знайдено");
+
+            return MapToDto(tour);
+        }
+
+
+
         public List<TourDto> Search(string query)
         {
             var tours = _repo.Search(query);
-
-            return tours.Select(t => new TourDto
-            {
-                TourId = t.TourId,
-                Name = t.Name,
-                Description = t.Description,
-                Price = t.Price,
-                DurationDays = t.DurationDays,
-                AvailableFrom = t.AvailableFrom,
-                AvailableTo = t.AvailableTo,
-                TypeId = t.TypeId,
-                Assets = t.TourAssets != null
-                    ? t.TourAssets.Select(a => new TourAssetDto
-                    {
-                        AssetType = a.AssetType,
-                        Url = a.Url
-                    }).ToList()
-                    : new List<TourAssetDto>()
-            }).ToList();
+            return tours.Select(MapToDto).ToList();
         }
+
 
         public void AddAsset(int tourId, string url, string assetType)
         {
             var tour = _repo.GetById(tourId);
 
             if (tour == null)
-                throw new AppException("NOT_FOUND", "Тур не знайдено");
+                throw new AppException(NotFoundCode, "Тур не знайдено");
 
             _context.TourAssets.Add(new TourAsset
             {
@@ -193,16 +192,14 @@ namespace Praktikum542.Services
         {
             var tour = _repo.GetById(id);
             if (tour == null)
-                throw new AppException("NOT_FOUND", "Тур не знайдено");
+                throw new AppException(NotFoundCode, "Тур не знайдено");
+
 
             foreach (var asset in tour.TourAssets)
             {
-                var folder = asset.AssetType == "video" ? "videos" : "images";
-                var fileName = Path.GetFileName(asset.Url);
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folder, fileName);
-                if (File.Exists(filePath))
-                    File.Delete(filePath);
+                DeleteAssetFile(asset);
             }
+
 
             var bookings = _context.Bookings.Where(b => b.TourId == id).ToList();
             var bookingIds = bookings.Select(b => b.BookingId).ToList();
@@ -221,6 +218,7 @@ namespace Praktikum542.Services
             _logger.LogInformation("Видалено тур ID={TourId}", id);
         }
 
+
         public PagedResultDto<TourDto> Filter(
             string? search,
             decimal? minPrice,
@@ -231,34 +229,26 @@ namespace Praktikum542.Services
             int page = 1,
             int pageSize = 6)
         {
-            var (tours, totalCount) = _repo.Filter(search, minPrice, maxPrice, minDays, maxDays, typeId, page, pageSize);
-
-            var tourDtos = tours.Select(t => new TourDto
-            {
-                TourId = t.TourId,
-                Name = t.Name,
-                Description = t.Description,
-                Price = t.Price,
-                DurationDays = t.DurationDays,
-                AvailableFrom = t.AvailableFrom,
-                AvailableTo = t.AvailableTo,
-                TypeId = t.TypeId,
-                Assets = t.TourAssets != null
-                    ? t.TourAssets.Select(a => new TourAssetDto
-                    {
-                        AssetType = a.AssetType,
-                        Url = a.Url
-                    }).ToList()
-                    : new List<TourAssetDto>()
-            }).ToList();
+            var (tours, totalCount) = _repo.Filter(
+                search,
+                minPrice,
+                maxPrice,
+                minDays,
+                maxDays,
+                typeId,
+                page,
+                pageSize
+            );
 
             return new PagedResultDto<TourDto>
             {
-                Items = tourDtos,
+                Items = tours.Select(MapToDto).ToList(),
                 TotalCount = totalCount,
                 Page = page,
                 PageSize = pageSize
             };
         }
-    }
+
+    
+}
 }
