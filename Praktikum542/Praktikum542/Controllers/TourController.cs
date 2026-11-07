@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +6,8 @@ using Praktikum542.DTOs;
 using Praktikum542.Models;
 using Praktikum542.Repositories;
 using Praktikum542.Services;
-
+using Microsoft.Extensions.Caching.Memory;
+using System.Text.Json;
 namespace Praktikum542.Controllers
 {
     [Route("api/tours")]
@@ -15,30 +16,47 @@ namespace Praktikum542.Controllers
     {
         private readonly TourService _service;
         private readonly PraktikumContext _context;
+        private readonly IMemoryCache _cache;
 
-        public TourController(TourService service, PraktikumContext context)
+
+        public TourController(
+            TourService service,
+            PraktikumContext context,
+            IMemoryCache cache)
         {
             _service = service;
             _context = context;
+            _cache = cache;
         }
+
 
         [Authorize(Roles = "manager")]
         [HttpPost]
         public IActionResult Create([FromBody] CreateTourDto dto)
         {
             var id = _service.CreateTour(dto);
+            InvalidateTourCache();
             return Ok(new { tourId = id });
         }
+
 
         [HttpGet("types")]
         public IActionResult GetTypes()
         {
-            var types = _context.TourTypes
-                .Select(t => new { t.TypeId, t.Name })
-                .ToList();
+            var types = _cache.GetOrCreate("tours:types", entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+
+                return _context.TourTypes
+                    .AsNoTracking()
+                    .Select(t => new { t.TypeId, t.Name })
+                    .ToList();
+            });
 
             return Ok(types);
         }
+
+
 
         [HttpGet]
         public IActionResult GetAll(
@@ -51,21 +69,62 @@ namespace Praktikum542.Controllers
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 6)
         {
-            return Ok(_service.Filter(search, minPrice, maxPrice, minDays, maxDays, typeId, page, pageSize));
+            if (page < 1 || pageSize < 1 || pageSize > 100)
+                return BadRequest("Некоректні параметри пагінації");
+
+            if (minPrice < 0 || maxPrice < 0 ||
+                (minPrice.HasValue && maxPrice.HasValue && minPrice > maxPrice))
+                return BadRequest("Некоректний діапазон цін");
+
+            if (minDays < 1 || maxDays < 1 ||
+                (minDays.HasValue && maxDays.HasValue && minDays > maxDays))
+                return BadRequest("Некоректна тривалість туру");
+
+            if (typeId.HasValue && typeId.Value < 1)
+                return BadRequest("Некоректний тип туру");
+
+
+            var version = _cache.GetOrCreate(
+                "tours:version",
+                entry => Guid.NewGuid().ToString("N")
+            );
+
+            var parameters = JsonSerializer.Serialize(new
+            {
+                search,
+                minPrice,
+                maxPrice,
+                minDays,
+                maxDays,
+                typeId,
+                page,
+                pageSize
+            });
+
+            var cacheKey = $"tours:list:{version}:{parameters}";
+
+            var result = _cache.GetOrCreate(cacheKey, entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2);
+
+                return _service.Filter(
+                    search, minPrice, maxPrice,
+                    minDays, maxDays, typeId,
+                    page, pageSize
+                );
+            });
+
+            return Ok(result);
+
         }
 
-        [Authorize(Roles = "manager")]
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
-        {
-            return Ok(_service.GetById(id));
-        }
 
         [Authorize(Roles = "manager")]
         [HttpPut("{id}")]
         public IActionResult Update(int id, CreateTourDto dto)
         {
             _service.UpdateTour(id, dto);
+            InvalidateTourCache();
             return Ok("Tour updated");
         }
 
@@ -74,6 +133,7 @@ namespace Praktikum542.Controllers
         public IActionResult Delete(int id)
         {
             _service.DeleteTour(id);
+            InvalidateTourCache();
             return Ok("Deleted");
         }
 
@@ -84,6 +144,15 @@ namespace Praktikum542.Controllers
         {
             if (file == null || file.Length == 0)
                 return BadRequest("File is empty");
+
+
+
+            if (tourId <= 0)
+                return BadRequest("Некоректний ID туру");
+
+            if (!_context.Tours.Any(t => t.TourId == tourId))
+                return NotFound("Тур не знайдено");
+
 
             var allowedImageTypes = new[] { "image/jpeg", "image/png", "image/webp", "image/gif" };
             var allowedVideoTypes = new[] { "video/mp4", "video/webm", "video/quicktime" };
@@ -110,8 +179,20 @@ namespace Praktikum542.Controllers
             var assetType = file.ContentType.StartsWith("video") ? "video" : "image";
 
             _service.AddAsset(tourId, url, assetType);
+            InvalidateTourCache();
 
             return Ok(new { url });
         }
+
+        private void InvalidateTourCache()
+        {
+            _cache.Set(
+                "tours:version",
+                Guid.NewGuid().ToString("N")
+            );
+
+            _cache.Remove("tours:types");
+        }
+
     }
 }
